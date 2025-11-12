@@ -1274,32 +1274,32 @@
             <!-- Slide 19: Cómo se Compone Docker - Introducción -->
             <section>
                 <h2>DOCKER - ¿CÓMO SE COMPONE?</h2>
-                <div style="margin-top: 0.3em;">
-                    <h3 style="font-size: 0.95em; margin-bottom: 0.3em;">🔧 Componentes Fundamentales del Kernel de Linux</h3>
-                    <div class="two-columns" style="margin-top: 0.2em; gap: 0.6em;">
+                <div style="margin-top: 0.2em;">
+                    <h3 style="font-size: 0.9em; margin-bottom: 0.2em;">🔧 Componentes Fundamentales del Kernel de Linux</h3>
+                    <div class="two-columns" style="margin-top: 0.15em; gap: 0.5em;">
                         <div>
-                            <div class="highlight-box" style="padding: 0.4em 0.6em;">
-                                <h4 style="margin: 0 0 0.15em 0; color: var(--navy); font-size: 0.9em;">1️⃣ Namespaces</h4>
-                                <p style="margin: 0; font-size: 0.75em; line-height: 1.15;"><strong>Capa de aislamiento.</strong> Diferentes namespaces (pid, net, ipc, mnt, uts) impiden que un proceso vea otros procesos del host.</p>
+                            <div class="highlight-box" style="padding: 0.3em 0.5em;">
+                                <h4 style="margin: 0 0 0.1em 0; color: var(--navy); font-size: 0.85em;">1️⃣ Namespaces</h4>
+                                <p style="margin: 0; font-size: 0.7em; line-height: 1.1;"><strong>Capa de aislamiento.</strong> Diferentes namespaces (pid, net, ipc, mnt, uts).</p>
                             </div>
-                            <div class="highlight-box" style="margin-top: 0.4em; padding: 0.4em 0.6em;">
-                                <h4 style="margin: 0 0 0.15em 0; color: var(--navy); font-size: 0.9em;">2️⃣ Cgroups</h4>
-                                <p style="margin: 0; font-size: 0.75em; line-height: 1.15;"><strong>Limitación de recursos</strong> (cpu, mem, I/O). Control de cuánta CPU, memoria e I/O usa cada contenedor.</p>
+                            <div class="highlight-box" style="margin-top: 0.3em; padding: 0.3em 0.5em;">
+                                <h4 style="margin: 0 0 0.1em 0; color: var(--navy); font-size: 0.85em;">2️⃣ Cgroups</h4>
+                                <p style="margin: 0; font-size: 0.7em; line-height: 1.1;"><strong>Limitación de recursos</strong> (cpu, mem, I/O).</p>
                             </div>
                         </div>
                         <div>
-                            <div class="highlight-box" style="padding: 0.4em 0.6em;">
-                                <h4 style="margin: 0 0 0.15em 0; color: var(--navy); font-size: 0.9em;">3️⃣ UnionFS</h4>
-                                <p style="margin: 0; font-size: 0.75em; line-height: 1.15;"><strong>Sistema de archivos en capas</strong> que almacena cambios en diferentes capas. Permite compartir capas base entre contenedores.</p>
+                            <div class="highlight-box" style="padding: 0.3em 0.5em;">
+                                <h4 style="margin: 0 0 0.1em 0; color: var(--navy); font-size: 0.85em;">3️⃣ UnionFS</h4>
+                                <p style="margin: 0; font-size: 0.7em; line-height: 1.1;"><strong>Sistema de archivos en capas</strong> que almacena cambios en diferentes capas.</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="image-center" style="margin: 0.5em 0 0.2em 0;">
-                        <img src="https://docs.docker.com/get-started/images/docker-architecture.webp" alt="Componentes de Docker" style="max-width: 65%; height: auto; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"/>
+                    <div class="image-center" style="margin: 0.3em 0 0.1em 0;">
+                        <img src="https://docs.docker.com/get-started/images/docker-architecture.webp" alt="Componentes de Docker" style="max-width: 50%; height: auto; border-radius: 6px; box-shadow: 0 3px 5px rgba(0,0,0,0.1);"/>
                     </div>
                 </div>
-                <p style="font-size: 0.7em; color: #666; text-align: right; margin-top: 0.1em;">Ref: <a href="#/42" style="color: var(--accent-blue); text-decoration: none;">[BER14]</a></p>
+                <p style="font-size: 0.7em; color: #666; text-align: right; margin-top: 0.05em;">Ref: <a href="#/42" style="color: var(--accent-blue); text-decoration: none;">[BER14]</a></p>
             </section>
 
             <!-- Slide 20: Arquitectura Técnica de Docker -->
