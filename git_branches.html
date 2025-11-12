@@ -1,0 +1,2398 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Versiones con GIT</title>
+
+    <!-- Reveal.js CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/white.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --negro: #2E2E2E;
+            --gris-oscuro: #6E6353;
+            --gris-medio: #8A887E;
+            --gris-claro: #A2A092;
+            --blanco-roto: #D1D0CB;
+            --navy: #1A2B4C;
+            --terracota: #8B4A2B;
+            --accent-blue: #4A90E2;
+            --cyan: #00BCD4;
+        }
+
+        .reveal {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 22px;
+            color: var(--negro);
+            background-color: var(--blanco-roto);
+        }
+
+        .reveal h1 {
+            color: var(--navy);
+            font-size: 2.2em;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 0.3em;
+            letter-spacing: 0.05em;
+        }
+
+        .reveal h2 {
+            color: var(--navy);
+            font-size: 1.6em;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 0.5em;
+            letter-spacing: 0.05em;
+            border-bottom: 3px solid var(--terracota);
+            padding-bottom: 0.3em;
+            display: inline-block;
+        }
+
+        .reveal h3 {
+            color: var(--gris-oscuro);
+            font-size: 1.2em;
+            font-weight: 600;
+            text-transform: none;
+            margin-bottom: 0.4em;
+        }
+
+        .reveal .slides section {
+            text-align: left;
+            padding: 15px;
+            height: 100%;
+        }
+
+        .reveal section.title-slide {
+            text-align: center;
+        }
+
+        .reveal ul {
+            margin: 0.5em 0;
+            line-height: 1.4;
+        }
+
+        .reveal li {
+            margin: 0.3em 0;
+            font-size: 0.95em;
+        }
+
+        .reveal strong {
+            color: var(--gris-oscuro);
+            font-weight: 600;
+        }
+
+        .reveal code {
+            background: rgba(139, 74, 43, 0.1);
+            padding: 0.2em 0.5em;
+            border-radius: 4px;
+            color: var(--terracota);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+            font-weight: 500;
+            border: 1px solid rgba(139, 74, 43, 0.2);
+        }
+
+        .reveal pre {
+            margin: 0.5em 0;
+            font-size: 0.75em;
+        }
+
+        .reveal pre code {
+            padding: 1em;
+            background: var(--negro);
+            color: var(--blanco-roto);
+            border: 2px solid var(--gris-oscuro);
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            box-shadow: 0 4px 12px rgba(46, 46, 46, 0.2);
+        }
+
+        .logo-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5em;
+        }
+
+        .logo-container img {
+            max-height: 60px;
+            object-fit: contain;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5em;
+            align-items: center;
+        }
+
+        .image-center {
+            text-align: center;
+            margin: 0.5em 0;
+        }
+
+        .image-center img {
+            max-width: 100%;
+            max-height: 450px;
+            object-fit: contain;
+        }
+
+        .image-full img {
+            width: 100%;
+            max-height: 550px;
+            object-fit: contain;
+        }
+
+        .compact-list {
+            font-size: 0.85em;
+            line-height: 1.3;
+        }
+
+        .compact-list li {
+            margin: 0.2em 0;
+        }
+
+        .highlight-box {
+            background: rgba(139, 74, 43, 0.08);
+            padding: 1em 1.2em;
+            border-radius: 8px;
+            margin: 0.5em 0;
+            font-size: 0.9em;
+            border-left: 4px solid var(--terracota);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .pixel-pattern {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 200px;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(74, 144, 226, 0.05) 50%,
+                rgba(0, 188, 212, 0.08) 100%);
+        }
+
+        .reveal .slide-number {
+            color: var(--navy);
+            background: rgba(232, 244, 248, 0.8);
+            font-size: 0.7em;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 0.9em;
+            font-weight: 300;
+            margin-top: 1em;
+        }
+
+        .cmd-box {
+            background: var(--negro);
+            color: var(--blanco-roto);
+            padding: 0.8em 1.2em;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            margin: 0.5em 0;
+            font-size: 0.85em;
+            border: 2px solid var(--gris-oscuro);
+            box-shadow: 0 4px 12px rgba(46, 46, 46, 0.2);
+        }
+
+        table {
+            font-size: 0.75em;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th {
+            background: var(--navy);
+            color: var(--blanco-roto);
+            padding: 0.6em;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        table td {
+            border: 1px solid var(--gris-claro);
+            padding: 0.5em;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        table tr:hover td {
+            background: rgba(139, 74, 43, 0.05);
+        }
+
+        /* ==========================================
+           NAVIGATION STYLES
+           ========================================== */
+        .menu-button {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            z-index: 1000;
+            background: var(--navy);
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.5em;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .menu-button:hover {
+            background: var(--terracota);
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(139, 74, 43, 0.3);
+        }
+
+        .index-button {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: var(--terracota);
+            color: var(--blanco-roto);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            box-shadow: 0 4px 6px rgba(139, 74, 43, 0.3);
+            transition: all 0.3s;
+        }
+
+        .index-button:hover {
+            background: var(--navy);
+            transform: translateX(-50%) scale(1.05);
+            box-shadow: 0 6px 12px rgba(26, 43, 76, 0.3);
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        .nav-panel {
+            position: fixed;
+            left: -350px;
+            top: 0;
+            width: 350px;
+            height: 100%;
+            background: var(--navy);
+            color: white;
+            z-index: 1000;
+            transition: left 0.3s ease;
+            overflow-y: auto;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.2);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .nav-panel.active {
+            left: 0;
+        }
+
+        .nav-panel-header {
+            padding: 20px;
+            background: linear-gradient(135deg, var(--navy) 0%, #0f1a2e 100%);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            border-bottom: 2px solid var(--accent-blue);
+        }
+
+        .nav-panel-header h3 {
+            margin: 0;
+            color: white;
+            font-size: 1.3em;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .close-button {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.8em;
+            cursor: pointer;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .close-button:hover {
+            background: rgba(255,255,255,0.1);
+            transform: rotate(90deg);
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-section {
+            padding: 15px 20px 8px;
+            font-weight: 700;
+            font-size: 0.85em;
+            color: var(--accent-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-top: 10px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .nav-item {
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            border-left: 3px solid transparent;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .nav-item:hover {
+            background: rgba(74, 144, 226, 0.2);
+            border-left-color: var(--accent-blue);
+        }
+
+        .nav-item-number {
+            background: rgba(255,255,255,0.1);
+            color: var(--accent-blue);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-right: 12px;
+            min-width: 35px;
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .nav-item-title {
+            font-size: 0.9em;
+            flex: 1;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+        }
+
+        .nav-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .nav-panel::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.2);
+        }
+
+        .nav-panel::-webkit-scrollbar-thumb {
+            background: var(--accent-blue);
+            border-radius: 4px;
+        }
+
+        .nav-panel::-webkit-scrollbar-thumb:hover {
+            background: var(--cyan);
+        }
+
+        .index-slide .index-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1em;
+            font-size: 0.7em;
+            max-height: 550px;
+            overflow-y: auto;
+            padding-right: 0.5em;
+        }
+
+        .index-slide .index-grid::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .index-slide .index-grid::-webkit-scrollbar-track {
+            background: rgba(139, 74, 43, 0.1);
+            border-radius: 4px;
+        }
+
+        .index-slide .index-grid::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--terracota) 0%, transparent 100%);
+            border-radius: 4px;
+        }
+
+        .index-slide .index-grid::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, var(--navy) 0%, var(--terracota) 100%);
+        }
+
+        .index-slide .index-section {
+            background: var(--light-blue);
+            padding: 0.8em;
+            border-radius: 6px;
+            border-left: 4px solid var(--accent-blue);
+        }
+
+        .index-slide .index-section h3 {
+            color: var(--navy);
+            font-size: 1em;
+            margin: 0 0 0.5em 0;
+        }
+
+        .index-slide .index-section ul {
+            margin: 0;
+            padding-left: 1.5em;
+            list-style: disc;
+        }
+
+        .index-slide .index-section li {
+            margin: 0.3em 0;
+            font-size: 0.9em;
+            line-height: 1.3;
+        }
+
+        .index-slide .index-section a {
+            color: var(--text-gray);
+            text-decoration: none;
+            display: block;
+            padding: 0.2em 0;
+            transition: all 0.2s;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .index-slide .index-section a:hover {
+            color: var(--accent-blue);
+            background: rgba(74, 144, 226, 0.1);
+            padding-left: 0.5em;
+            transform: translateX(5px);
+        }
+
+        .index-slide .clickable-item {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- Slide 1: Portada -->
+            <section class="title-slide">
+                <div style="display: flex; justify-content: center; align-items: center; gap: 2em; margin-bottom: 1em;">
+                    <!-- Logo UNLu -->
+                    <img src="https://cdn.brandfetch.io/idrnSXGc11/w/316/h/316/theme/dark/logo.png?c=1bxid64Mup7aczewSAYMX&t=1761595635331" alt="Universidad Nacional de Luján" style="max-height: 100px;">
+
+                    <!-- Logo DCB -->
+                    <img src="https://www.basicas.unlu.edu.ar/sites/www.basicas.unlu.edu.ar/files/site/Logo_color.png" alt="Departamento de Ciencias Básicas" style="max-height: 100px;">
+
+                    <!-- Logo LICDIA -->
+                    <img src="https://licdia.unlu.edu.ar/assets/img/logo.ico" alt="LICDIA" style="max-height: 100px;">
+                </div>
+                <h1 style="margin-top: 0.5em;">CONTROL DE VERSIONES<br>UTILIZANDO GIT</h1>
+                <p class="subtitle">Diplomatura de Posgrado en Desarrollo de Soluciones de Inteligencia Artificial Generativa en la Nube<br>Departamento de Ciencias Básicas<br>Universidad Nacional de Luján</p>
+            </section>
+
+            <!-- Slide 2: Índice -->
+            <section class="index-slide">
+                <h2 style="text-align: center; color: var(--navy); margin-bottom: 0.8em;">📋 ÍNDICE DE CONTENIDOS</h2>
+                <div class="index-grid">
+                    <div class="index-section">
+                        <h3>🎯 Fundamentos de Git</h3>
+                        <ul>
+                            <li><a class="index-link" data-slide="2">Motivación y problemas</a></li>
+                            <li><a class="index-link" data-slide="4">¿Qué es control de versiones?</a></li>
+                            <li><a class="index-link" data-slide="5">Ventajas del control de versiones</a></li>
+                            <li><a class="index-link" data-slide="6">Git: Principios fundamentales</a></li>
+                            <li><a class="index-link" data-slide="7">Las tres secciones (Working/Staging/Repo)</a></li>
+                            <li><a class="index-link" data-slide="8">Staging Area: analogía del estudio fotográfico</a></li>
+                            <li><a class="index-link" data-slide="10">Flujo de trabajo en Git</a></li>
+                        </ul>
+                    </div>
+                    <div class="index-section">
+                        <h3>🌿 Branches & Merge</h3>
+                        <ul>
+                            <li><a class="index-link" data-slide="11">Repositorio: ramas (HEAD, MASTER)</a></li>
+                            <li><a class="index-link" data-slide="12">Trabajar en paralelo con branches</a></li>
+                            <li><a class="index-link" data-slide="13">Comandos básicos de Git</a></li>
+                            <li><a class="index-link" data-slide="14">Merge: fusionar ramas</a></li>
+                            <li><a class="index-link" data-slide="15">Conflictos de merge y resolución</a></li>
+                        </ul>
+                    </div>
+                    <div class="index-section">
+                        <h3>🔀 Estrategias Avanzadas</h3>
+                        <ul>
+                            <li><a class="index-link" data-slide="16">Git Flow, GitHub Flow, Trunk-Based</a></li>
+                            <li><a class="index-link" data-slide="17">Git Flow: Diagrama</a></li>
+                            <li><a class="index-link" data-slide="18">Rebase vs Merge</a></li>
+                            <li><a class="index-link" data-slide="19">Rebase interactivo (squash, reword)</a></li>
+                            <li><a class="index-link" data-slide="20">Cherry-pick</a></li>
+                            <li><a class="index-link" data-slide="21">Stash (guardar cambios temporalmente)</a></li>
+                            <li><a class="index-link" data-slide="22">Reset vs Revert</a></li>
+                        </ul>
+                    </div>
+                    <div class="index-section">
+                        <h3>🔧 Herramientas & Hooks</h3>
+                        <ul>
+                            <li><a class="index-link" data-slide="23">Git Hooks (client-side & server-side)</a></li>
+                            <li><a class="index-link" data-slide="24">Tags (lightweight & annotated)</a></li>
+                            <li><a class="index-link" data-slide="25">Submodules & Subtrees</a></li>
+                            <li><a class="index-link" data-slide="26">.gitignore</a></li>
+                            <li><a class="index-link" data-slide="27">Flujo de trabajo típico</a></li>
+                            <li><a class="index-link" data-slide="28">Buenas prácticas Git</a></li>
+                            <li><a class="index-link" data-slide="29">Conventional Commits</a></li>
+                            <li><a class="index-link" data-slide="30">Comandos avanzados (reflog, bisect, blame)</a></li>
+                        </ul>
+                    </div>
+                    <div class="index-section">
+                        <h3>🔄 CI/CD & Automatización</h3>
+                        <ul>
+                            <li><a class="index-link" data-slide="32">CI/CD: Integración y entrega continua</a></li>
+                            <li><a class="index-link" data-slide="33">GitHub Actions</a></li>
+                            <li><a class="index-link" data-slide="34">GitHub Actions: Ejemplo básico</a></li>
+                            <li><a class="index-link" data-slide="35">GitHub Actions: Features avanzadas</a></li>
+                            <li><a class="index-link" data-slide="36">GitHub Actions: Marketplace</a></li>
+                            <li><a class="index-link" data-slide="37">GitLab CI/CD (.gitlab-ci.yml)</a></li>
+                            <li><a class="index-link" data-slide="38">Pipeline CI/CD completo</a></li>
+                            <li><a class="index-link" data-slide="39">Testing en pipelines</a></li>
+                            <li><a class="index-link" data-slide="40">Security Scanning (SAST, deps, containers)</a></li>
+                        </ul>
+                    </div>
+                    <div class="index-section">
+                        <h3>🚀 Deployment & Monitoring</h3>
+                        <ul>
+                            <li><a class="index-link" data-slide="41">Estrategias de deployment</a></li>
+                            <li><a class="index-link" data-slide="42">Gestión de entornos (Dev/QA/Staging/Prod)</a></li>
+                            <li><a class="index-link" data-slide="43">Monitoring & Observability</a></li>
+                            <li><a class="index-link" data-slide="44">Buenas prácticas CI/CD</a></li>
+                        </ul>
+                    </div>
+                    <div class="index-section">
+                        <h3>📚 Referencias</h3>
+                        <ul>
+                            <li><a class="index-link" data-slide="48">Recursos y documentación</a></li>
+                            <li><a class="index-link" data-slide="49">Bibliografía y papers académicos</a></li>
+                        </ul>
+                    </div>
+                    <div class="index-section">
+                        <h3>❓ Cierre</h3>
+                        <ul>
+                            <li><a class="index-link" data-slide="50">¿Preguntas?</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <p style="text-align: center; margin-top: 1em; font-size: 0.8em; color: #666;">
+                    <strong>Total: 50 slides</strong> | Click en cualquier tema para navegar | Presiona <code>M</code> para menú completo
+                </p>
+            </section>
+
+            <!-- Slide 3: Motivación 1 - Archivos -->
+            <section>
+                <h2>MOTIVACIÓN (1)</h2>
+                <div style="display: flex; justify-content: center; gap: 1em; margin-top: 1em; flex-wrap: wrap;">
+                    <svg width="100" height="120" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="10" y="15" width="80" height="100" fill="#D3D3D3" rx="5"/>
+                        <path d="M 10 15 L 10 25 L 60 25 L 70 15 Z" fill="#A9A9A9"/>
+                        <line x1="20" y1="40" x2="80" y2="40" stroke="#666" stroke-width="2"/>
+                        <line x1="20" y1="50" x2="80" y2="50" stroke="#666" stroke-width="2"/>
+                        <line x1="20" y1="60" x2="70" y2="60" stroke="#666" stroke-width="2"/>
+                        <text x="50" y="95" font-family="monospace" font-size="10" fill="#333" text-anchor="middle">tp_final.tex</text>
+                    </svg>
+                    <svg width="100" height="120" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="10" y="15" width="80" height="100" fill="#D3D3D3" rx="5"/>
+                        <path d="M 10 15 L 10 25 L 60 25 L 70 15 Z" fill="#A9A9A9"/>
+                        <line x1="20" y1="40" x2="80" y2="40" stroke="#666" stroke-width="2"/>
+                        <line x1="20" y1="50" x2="80" y2="50" stroke="#666" stroke-width="2"/>
+                        <line x1="20" y1="60" x2="70" y2="60" stroke="#666" stroke-width="2"/>
+                        <text x="50" y="95" font-family="monospace" font-size="9" fill="#333" text-anchor="middle">tp_final_2.tex</text>
+                    </svg>
+                    <svg width="120" height="120" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="10" y="15" width="100" height="100" fill="#D3D3D3" rx="5"/>
+                        <path d="M 10 15 L 10 25 L 70 25 L 80 15 Z" fill="#A9A9A9"/>
+                        <line x1="20" y1="40" x2="100" y2="40" stroke="#666" stroke-width="2"/>
+                        <line x1="20" y1="50" x2="100" y2="50" stroke="#666" stroke-width="2"/>
+                        <line x1="20" y1="60" x2="90" y2="60" stroke="#666" stroke-width="2"/>
+                        <text x="60" y="95" font-family="monospace" font-size="8" fill="#333" text-anchor="middle">tp_final_este_va.tex</text>
+                    </svg>
+                    <svg width="110" height="120" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="10" y="15" width="90" height="100" fill="#D3D3D3" rx="5"/>
+                        <path d="M 10 15 L 10 25 L 65 25 L 75 15 Z" fill="#A9A9A9"/>
+                        <line x1="20" y1="40" x2="90" y2="40" stroke="#666" stroke-width="2"/>
+                        <line x1="20" y1="50" x2="90" y2="50" stroke="#666" stroke-width="2"/>
+                        <line x1="20" y1="60" x2="80" y2="60" stroke="#666" stroke-width="2"/>
+                        <text x="55" y="95" font-family="monospace" font-size="8" fill="#333" text-anchor="middle">tp_final_posta.tex</text>
+                    </svg>
+                    <svg width="130" height="120" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="10" y="15" width="110" height="100" fill="#D3D3D3" rx="5"/>
+                        <path d="M 10 15 L 10 25 L 75 25 L 85 15 Z" fill="#A9A9A9"/>
+                        <line x1="20" y1="40" x2="110" y2="40" stroke="#666" stroke-width="2"/>
+                        <line x1="20" y1="50" x2="110" y2="50" stroke="#666" stroke-width="2"/>
+                        <line x1="20" y1="60" x2="100" y2="60" stroke="#666" stroke-width="2"/>
+                        <text x="65" y="95" font-family="monospace" font-size="8" fill="#333" text-anchor="middle">tp_final_reentrega.tex</text>
+                    </svg>
+                </div>
+                <div style="text-align: center; margin-top: 2em;">
+                    <svg width="200" height="180" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Cara asustada -->
+                        <circle cx="100" cy="90" r="70" fill="#E0E0E0" stroke="#333" stroke-width="3"/>
+                        <!-- Ojos muy abiertos -->
+                        <ellipse cx="75" cy="75" rx="15" ry="20" fill="white" stroke="#333" stroke-width="2"/>
+                        <ellipse cx="125" cy="75" rx="15" ry="20" fill="white" stroke="#333" stroke-width="2"/>
+                        <circle cx="75" cy="75" r="8" fill="#000"/>
+                        <circle cx="125" cy="75" r="8" fill="#000"/>
+                        <!-- Boca abierta de pánico -->
+                        <ellipse cx="100" cy="120" rx="25" ry="30" fill="#333"/>
+                        <!-- Cejas levantadas -->
+                        <path d="M 60 55 Q 75 50 90 55" stroke="#333" stroke-width="3" fill="none"/>
+                        <path d="M 110 55 Q 125 50 140 55" stroke="#333" stroke-width="3" fill="none"/>
+                        <!-- Gotas de sudor -->
+                        <ellipse cx="40" cy="50" rx="8" ry="12" fill="#4A90E2" opacity="0.6"/>
+                        <ellipse cx="160" cy="50" rx="8" ry="12" fill="#4A90E2" opacity="0.6"/>
+                    </svg>
+                </div>
+            </section>
+
+            <!-- Slide 3: Motivación 2 -->
+            <section>
+                <h2>MOTIVACIÓN (2)</h2>
+                <ul class="compact-list">
+                    <li>Supongamos que dos programadores trabajan juntos en un mismo código, cada uno en su computadora.</li>
+                    <li>¿Qué sucede cuando ambos cambian el mismo archivo?</li>
+                    <li>Además, ¿cómo volver a versiones anteriores?</li>
+                    <li>Supongamos que la versión de hace una semana tenía solucionado un problema que ahora resurgió, ¿cómo recuperarla?</li>
+                    <li>¿Y si se rompe el disco?!!!</li>
+                </ul>
+            </section>
+
+            <!-- Slide 4: ¿Qué es? -->
+            <section>
+                <h2>¿QUÉ ES EL CONTROL DE VERSIONES?</h2>
+                <div class="two-columns">
+                    <div>
+                        <p style="font-size: 0.95em;">El control de versiones es un sistema que almacena y organiza los <strong>cambios</strong> realizados a uno o varios archivos para <strong>permitir acceder a distintas versiones</strong> de los mismos posteriormente.</p>
+                    </div>
+                    <div class="image-center">
+                        <svg width="240" height="300" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Fondo libro -->
+                            <rect x="30" y="10" width="180" height="270" fill="#8B4513" rx="5"/>
+                            <rect x="35" y="15" width="170" height="260" fill="#A0522D" rx="3"/>
+                            <!-- Título -->
+                            <rect x="45" y="30" width="150" height="80" fill="#D2691E" rx="3"/>
+                            <text x="120" y="55" font-family="serif" font-size="14" font-weight="bold" fill="#FFD700" text-anchor="middle">H. G. Wells</text>
+                            <text x="120" y="75" font-family="serif" font-size="16" font-weight="bold" fill="white" text-anchor="middle">LA MÁQUINA</text>
+                            <text x="120" y="95" font-family="serif" font-size="16" font-weight="bold" fill="white" text-anchor="middle">DEL TIEMPO</text>
+                            <!-- Reloj -->
+                            <circle cx="120" cy="180" r="60" fill="#333" stroke="#FFD700" stroke-width="3"/>
+                            <circle cx="120" cy="180" r="55" fill="#1a1a1a"/>
+                            <!-- Números del reloj (romanos) -->
+                            <text x="120" y="135" font-family="serif" font-size="12" fill="#FFD700" text-anchor="middle">XII</text>
+                            <text x="165" y="185" font-family="serif" font-size="12" fill="#FFD700" text-anchor="middle">III</text>
+                            <text x="120" y="230" font-family="serif" font-size="12" fill="#FFD700" text-anchor="middle">VI</text>
+                            <text x="75" y="185" font-family="serif" font-size="12" fill="#FFD700" text-anchor="middle">IX</text>
+                            <!-- Manecillas -->
+                            <line x1="120" y1="180" x2="120" y2="150" stroke="#FFD700" stroke-width="3" stroke-linecap="round"/>
+                            <line x1="120" y1="180" x2="140" y2="180" stroke="#FFD700" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="120" cy="180" r="5" fill="#FFD700"/>
+                            <!-- Subtítulo -->
+                            <text x="120" y="260" font-family="serif" font-size="12" font-style="italic" fill="#FFD700" text-anchor="middle">THE TIME</text>
+                            <text x="120" y="275" font-family="serif" font-size="12" font-style="italic" fill="#FFD700" text-anchor="middle">MACHINE</text>
+                        </svg>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 5: Ventajas -->
+            <section>
+                <h2>VENTAJAS DEL CONTROL DE VERSIONES</h2>
+                <ul class="compact-list">
+                    <li>Permite revertir archivos o el proyecto entero a versiones anteriores.</li>
+                    <li>Permite comparar versiones, ver cambios.</li>
+                    <li>Permite trabajar de forma colectiva en grupos.</li>
+                    <li>Permite recuperar los archivos en caso de pérdida o de algún error catastrófico.</li>
+                    <li>Permite tener una historia del código (commits).</li>
+                    <li>Permite el desarrollo incremental de código.</li>
+                </ul>
+                <p style="font-size: 0.7em; color: #666; margin-top: 1.5em; text-align: right;">
+                    <a href="#/49" style="color: var(--accent-blue); text-decoration: none;">[SPI05]</a>
+                </p>
+            </section>
+
+            <!-- Slide 6: Principios Fundamentales -->
+            <section>
+                <h2>GIT: PRINCIPIOS FUNDAMENTALES</h2>
+                <div style="font-size: 0.85em;">
+                    <h3>Sistemas Basados en Diferencias vs Git (Instantáneas)</h3>
+                    <img src="https://git-scm.com/book/en/v2/images/deltas.png" alt="Diferencias" style="max-width: 100%; max-height: 180px; margin: 0.3em 0;">
+                    <img src="https://git-scm.com/book/en/v2/images/snapshots.png" alt="Snapshots" style="max-width: 100%; max-height: 180px; margin: 0.3em 0;">
+                </div>
+                <p style="font-size: 0.7em; color: #666; margin-top: 1em; text-align: right;">
+                    <a href="#/49" style="color: var(--accent-blue); text-decoration: none;">[CHA14]</a>
+                </p>
+            </section>
+
+            <!-- Slide 7: Staging Area Secuencia -->
+            <section>
+                <h2>STAGING AREA: FLUJO DE TRABAJO</h2>
+                <p style="font-size: 0.85em; margin-bottom: 0.8em;">
+                    El <strong>Staging Area</strong> es como preparar una "foto" antes de tomarla. Primero eliges qué objetos poner en escena (<code>git add</code>),
+                    y luego tomas la foto permanente (<code>git commit</code>). Puedes agregar o quitar elementos antes del commit final.
+                </p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1em; font-size: 0.75em;">
+                    <div style="text-align: center;">
+                        <p><strong>1. Escenario vacío</strong></p>
+                        <div class="cmd-box" style="font-size: 0.9em; padding: 0.8em;">
+                            <div style="color: #888;">$ git status</div>
+                            <div style="color: #aaa; margin-top: 0.3em;">Nothing to commit</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center;">
+                        <p><strong>2. Agrego objeto</strong> <code>git add archivo.js</code></p>
+                        <div class="cmd-box" style="font-size: 0.9em; padding: 0.8em;">
+                            <div style="color: #888;">$ git status</div>
+                            <div style="color: #8BC34A; margin-top: 0.3em;">+ archivo.js (staged)</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center;">
+                        <p><strong>3. Agrego más</strong> <code>git add style.css</code></p>
+                        <div class="cmd-box" style="font-size: 0.9em; padding: 0.8em;">
+                            <div style="color: #888;">$ git status</div>
+                            <div style="color: #8BC34A; margin-top: 0.3em;">+ archivo.js (staged)</div>
+                            <div style="color: #8BC34A;">+ style.css (staged)</div>
+                        </div>
+                    </div>
+                    <div style="text-align: center;">
+                        <p><strong>4. Tomo la foto</strong> <code>git commit</code></p>
+                        <div class="cmd-box" style="font-size: 0.9em; padding: 0.8em;">
+                            <div style="color: #888;">$ git commit -m "Add files"</div>
+                            <div style="color: #4A90E2; margin-top: 0.3em;">✓ 2 files changed</div>
+                            <div style="color: #4A90E2;">✓ Commit: a1b2c3d</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 13: Flujo de Trabajo -->
+            <section>
+                <h2>GIT: FLUJO DE TRABAJO</h2>
+                <div class="two-columns">
+                    <div style="font-size: 0.75em;">
+                        <p><strong style="color: var(--terracota);">● Directorio de trabajo</strong> - donde desarrollamos código</p>
+                        <p style="margin-left: 1em;">→ <code>add</code> agrega archivos al staging</p>
+                        <p><strong style="color: #F39C12;">● Staging area (cache)</strong> - archivos listos para commit</p>
+                        <p style="margin-left: 1em;">→ <code>commit</code> envía al repositorio local</p>
+                        <p><strong style="color: #27AE60;">● Repositorio local</strong> - control de versiones local</p>
+                        <p style="margin-left: 1em;">→ <code>pull/fetch</code> actualiza desde remoto</p>
+                        <p style="margin-left: 1em;">→ <code>push</code> modifica repositorio remoto</p>
+                        <p><strong style="color: var(--navy);">● Repositorio remoto</strong> - compartido entre usuarios</p>
+                        <p style="font-size: 0.8em; color: #666; margin-top: 1em;">
+                            <a href="#/49" style="color: var(--accent-blue); text-decoration: none;">[BIR09]</a>
+                        </p>
+                    </div>
+                    <div>
+                        <svg width="450" height="380" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <marker id="arrow2" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                                    <polygon points="0 0, 8 4, 0 8" fill="#333"/>
+                                </marker>
+                            </defs>
+                            <!-- Remote Repository -->
+                            <rect x="130" y="10" width="190" height="65" fill="#1A2B4C" rx="8"/>
+                            <text x="225" y="38" font-family="Inter" font-size="15" fill="white" text-anchor="middle" font-weight="bold">Remote repository</text>
+                            <text x="225" y="58" font-family="Inter" font-size="11" fill="#D1D0CB" text-anchor="middle">(GitHub, GitLab)</text>
+
+                            <!-- Arrows fetch/pull and push -->
+                            <line x1="180" y1="80" x2="180" y2="115" stroke="#555" stroke-width="2" marker-end="url(#arrow2)"/>
+                            <text x="145" y="100" font-family="Inter" font-size="11" fill="#555">fetch/pull</text>
+
+                            <line x1="270" y1="115" x2="270" y2="80" stroke="#555" stroke-width="2" marker-end="url(#arrow2)"/>
+                            <text x="285" y="100" font-family="Inter" font-size="11" fill="#555">push</text>
+
+                            <!-- Local Repository -->
+                            <rect x="130" y="125" width="190" height="65" fill="#27AE60" rx="8"/>
+                            <text x="225" y="153" font-family="Inter" font-size="15" fill="white" text-anchor="middle" font-weight="bold">Local repository</text>
+                            <text x="225" y="173" font-family="Inter" font-size="11" fill="#D1D0CB" text-anchor="middle">(.git directory)</text>
+
+                            <!-- Arrow commit -->
+                            <line x1="225" y1="195" x2="225" y2="230" stroke="#555" stroke-width="2" marker-end="url(#arrow2)"/>
+                            <text x="245" y="215" font-family="Inter" font-size="11" fill="#555">commit</text>
+
+                            <!-- Index / Staging Area -->
+                            <rect x="130" y="240" width="190" height="65" fill="#F39C12" rx="8"/>
+                            <text x="225" y="268" font-family="Inter" font-size="15" fill="white" text-anchor="middle" font-weight="bold">Index (cache)</text>
+                            <text x="225" y="288" font-family="Inter" font-size="11" fill="#333" text-anchor="middle">Staging Area</text>
+
+                            <!-- Arrows checkout and add -->
+                            <line x1="125" y1="310" x2="90" y2="335" stroke="#555" stroke-width="2" marker-end="url(#arrow2)"/>
+                            <text x="85" y="320" font-family="Inter" font-size="11" fill="#555">checkout</text>
+
+                            <line x1="90" y1="350" x2="125" y2="325" stroke="#555" stroke-width="2" marker-end="url(#arrow2)"/>
+                            <text x="95" y="350" font-family="Inter" font-size="11" fill="#555">add</text>
+
+                            <!-- Working directory -->
+                            <rect x="5" y="345" width="170" height="65" fill="#8B4A2B" rx="8"/>
+                            <text x="90" y="373" font-family="Inter" font-size="15" fill="white" text-anchor="middle" font-weight="bold">Working directory</text>
+                            <text x="90" y="393" font-family="Inter" font-size="11" fill="#D1D0CB" text-anchor="middle">(archivos locales)</text>
+                        </svg>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 14: Repositorio RAMA -->
+            <section>
+                <h2>REPOSITORIO: RAMA</h2>
+                <div class="image-center">
+                    <svg width="900" height="250" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="200" cy="125" r="45" fill="#ccc" stroke="#333" stroke-width="3"/>
+                        <circle cx="370" cy="125" r="45" fill="#4A90E2" stroke="#333" stroke-width="3"/>
+                        <circle cx="540" cy="125" r="45" fill="#ccc" stroke="#333" stroke-width="3"/>
+                        <circle cx="710" cy="125" r="45" fill="#ccc" stroke="#333" stroke-width="3"/>
+                        <line x1="245" y1="125" x2="325" y2="125" stroke="#333" stroke-width="3"/>
+                        <line x1="415" y1="125" x2="495" y2="125" stroke="#333" stroke-width="3"/>
+                        <line x1="585" y1="125" x2="665" y2="125" stroke="#333" stroke-width="3"/>
+                        <rect x="310" y="30" width="120" height="55" fill="#4A90E2" rx="5"/>
+                        <text x="370" y="65" font-family="Inter" font-size="28" fill="white" text-anchor="middle" font-weight="600">HEAD</text>
+                        <polygon points="370,85 360,105 380,105" fill="#4A90E2"/>
+                        <rect x="640" y="180" width="140" height="55" fill="#8BC34A" rx="5"/>
+                        <text x="710" y="215" font-family="Inter" font-size="26" fill="white" text-anchor="middle" font-weight="600">MASTER</text>
+                        <polygon points="710,180 700,165 720,165" fill="#8BC34A"/>
+                    </svg>
+                </div>
+            </section>
+
+            <!-- Slide 15: Branches -->
+            <section>
+                <h2>BRANCHES: TRABAJAR EN PARALELO</h2>
+                <div class="image-center">
+                    <img src="https://git-scm.com/book/en/v2/images/advance-master.png" alt="Branches" style="max-height: 280px;">
+                </div>
+                <p style="font-size: 0.85em; margin-top: 0.5em;">Las <strong>branches (ramas)</strong> permiten desarrollar funcionalidades aisladas. Cada desarrollador puede trabajar en su propia rama sin afectar el código principal.</p>
+            </section>
+
+            <!-- Slide 16: Comandos Básicos -->
+            <section>
+                <h2>COMANDOS BÁSICOS</h2>
+                <div style="font-size: 0.7em; columns: 2; column-gap: 1.5em;">
+                    <div class="cmd-box">git init</div>
+                    <div class="cmd-box">git status</div>
+                    <div class="cmd-box">git add archivo.txt</div>
+                    <div class="cmd-box">git commit -m "mensaje"</div>
+                    <div class="cmd-box">git log</div>
+                    <div class="cmd-box">git diff</div>
+                    <div class="cmd-box">git branch</div>
+                    <div class="cmd-box">git checkout rama</div>
+                    <div class="cmd-box">git merge rama</div>
+                    <div class="cmd-box">git clone url</div>
+                    <div class="cmd-box">git push</div>
+                    <div class="cmd-box">git pull</div>
+                </div>
+            </section>
+
+            <!-- Slide 17: Merge -->
+            <section>
+                <h2>MERGE: FUSIONAR RAMAS</h2>
+                <div class="image-center">
+                    <img src="https://git-scm.com/book/en/v2/images/basic-merging-2.png" alt="Merge" style="max-height: 320px;">
+                </div>
+                <div class="cmd-box" style="text-align: center;">git merge feature-branch</div>
+            </section>
+
+            <!-- Slide 18: Conflictos -->
+            <section>
+                <h2>CONFLICTOS DE MERGE</h2>
+                <div class="two-columns">
+                    <div style="font-size: 0.8em;">
+                        <p>Cuando dos ramas modifican las mismas líneas, Git no puede fusionarlas automáticamente.</p>
+                        <div class="highlight-box" style="margin-top: 0.5em;">
+                            <p><strong>Resolver conflictos:</strong></p>
+                            <ol style="font-size: 0.9em; margin: 0.3em 0;">
+                                <li>Git marca conflictos</li>
+                                <li>Editar manualmente</li>
+                                <li><code>git add archivo</code></li>
+                                <li><code>git commit</code></li>
+                            </ol>
+                        </div>
+                    </div>
+                    <div>
+                        <pre style="font-size: 0.6em;"><code><<<<<<< HEAD
+función actual()
+=======
+función nueva()
+>>>>>>> feature</code></pre>
+                        <div style="background: var(--terracota); color: white; padding: 1.5em; border-radius: 8px; margin-top: 1em; text-align: center; font-size: 1.2em; font-weight: 600;">
+                            ⚠️ MERGE CONFLICT<br>
+                            <span style="font-size: 0.7em; font-weight: 400;">Houston, tenemos un problema...</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 19: Estrategias de Branching -->
+            <section>
+                <h2>ESTRATEGIAS DE BRANCHING</h2>
+                <div style="font-size: 0.75em;">
+                    <h3 style="font-size: 1em; color: var(--accent-blue);">1. Git Flow (Vincent Driessen)</h3>
+                    <ul class="compact-list" style="margin-bottom: 0.5em;">
+                        <li><code>main/master</code> - producción estable</li>
+                        <li><code>develop</code> - integración de features</li>
+                        <li><code>feature/*</code> - nuevas funcionalidades</li>
+                        <li><code>release/*</code> - preparación de versiones</li>
+                        <li><code>hotfix/*</code> - parches urgentes</li>
+                    </ul>
+                    <h3 style="font-size: 1em; color: var(--accent-blue); margin-top: 0.5em;">2. GitHub Flow</h3>
+                    <ul class="compact-list" style="margin-bottom: 0.5em;">
+                        <li>Solo <code>main</code> + <code>feature branches</code></li>
+                        <li>Pull Requests para revisión</li>
+                        <li>Deploy desde main</li>
+                    </ul>
+                    <h3 style="font-size: 1em; color: var(--accent-blue); margin-top: 0.5em;">3. Trunk-Based Development</h3>
+                    <ul class="compact-list">
+                        <li>Una sola rama principal (trunk/main)</li>
+                        <li>Commits frecuentes y pequeños</li>
+                        <li>Feature flags para funcionalidades incompletas</li>
+                    </ul>
+                    <p style="font-size: 0.7em; color: #666; margin-top: 1em; text-align: right;">
+                        <a href="#/49" style="color: var(--accent-blue); text-decoration: none;">[CHA14]</a>
+                    </p>
+                </div>
+            </section>
+
+            <!-- Slide 20: Git Flow Diagram -->
+            <section>
+                <h2>GIT FLOW: DIAGRAMA</h2>
+                <div class="image-center">
+                    <img src="https://nvie.com/img/git-model@2x.png" alt="Git Flow" style="max-height: 500px;">
+                </div>
+            </section>
+
+            <!-- Slide 21: Rebase -->
+            <section>
+                <h2>GIT REBASE</h2>
+                <div class="two-columns">
+                    <div style="font-size: 0.8em;">
+                        <p><strong>Rebase</strong> reescribe el historial aplicando commits sobre otra base.</p>
+                        <div class="highlight-box">
+                            <p><strong>Ventajas:</strong></p>
+                            <ul style="font-size: 0.9em;">
+                                <li>Historial lineal y limpio</li>
+                                <li>Sin commits de merge</li>
+                            </ul>
+                        </div>
+                        <div class="highlight-box">
+                            <p><strong>Cuidado:</strong></p>
+                            <ul style="font-size: 0.9em;">
+                                <li>No hacer rebase en ramas públicas</li>
+                                <li>Reescribe el historial</li>
+                            </ul>
+                        </div>
+                        <div class="cmd-box">git rebase main</div>
+                    </div>
+                    <div class="image-center">
+                        <img src="https://git-scm.com/book/en/v2/images/basic-rebase-3.png" alt="Rebase" style="max-height: 350px;">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 22: Rebase Interactivo -->
+            <section>
+                <h2>REBASE INTERACTIVO</h2>
+                <p style="font-size: 0.85em;">Permite reescribir, combinar y reordenar commits:</p>
+                <div class="cmd-box">git rebase -i HEAD~3</div>
+                <pre style="font-size: 0.65em;"><code>pick f7f3f6d Commit 1
+squash 310154e Commit 2  # Combinar con anterior
+reword a5f4a0d Commit 3  # Cambiar mensaje
+edit 7e7e7e7 Commit 4     # Editar commit
+drop 1234567 Commit 5     # Eliminar commit</code></pre>
+                <div class="highlight-box" style="font-size: 0.8em; margin-top: 0.5em;">
+                    <strong>Usos comunes:</strong> Limpiar historial antes de PR, combinar commits relacionados, mejorar mensajes.
+                </div>
+            </section>
+
+            <!-- Meme: Rebase -->
+            <section style="text-align: center;">
+                <h3 style="font-size: 1.5em; color: var(--navy); margin-bottom: 0.5em;">"Mi historial de commits antes y después de rebase -i"</h3>
+                <div style="display: flex; justify-content: center; gap: 3em; margin: 1.5em 0;">
+                    <div>
+                        <p style="font-size: 0.9em; margin-bottom: 0.5em;"><strong>Antes:</strong></p>
+                        <div style="background: var(--negro); padding: 1em; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.7em; text-align: left; color: var(--blanco-roto);">
+                            fix typo<br>
+                            oops<br>
+                            actually fix it<br>
+                            aaaa it works!!!<br>
+                            remove debug logs<br>
+                            FINAL VERSION<br>
+                            FINAL FINAL
+                        </div>
+                    </div>
+                    <div style="font-size: 4em; align-self: center;">→</div>
+                    <div>
+                        <p style="font-size: 0.9em; margin-bottom: 0.5em;"><strong>Después:</strong></p>
+                        <div style="background: var(--negro); padding: 1em; border-radius: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.7em; text-align: left; color: var(--blanco-roto);">
+                            feat: implement user authentication<br>
+                            <br>
+                            <span style="color: #8BC34A;">✨ Clean history ✨</span>
+                        </div>
+                    </div>
+                </div>
+                <p style="font-size: 0.9em; color: var(--gris-oscuro); margin-top: 1em;">🎨 El poder de reescribir la historia (responsablemente)</p>
+            </section>
+
+            <!-- Slide 23: Cherry-pick -->
+            <section>
+                <h2>GIT CHERRY-PICK</h2>
+                <div class="two-columns">
+                    <div style="font-size: 0.85em;">
+                        <p>Aplica un commit específico de una rama a otra:</p>
+                        <div class="cmd-box">git cherry-pick abc123</div>
+                        <div class="highlight-box" style="margin-top: 0.8em;">
+                            <p><strong>Casos de uso:</strong></p>
+                            <ul style="font-size: 0.9em;">
+                                <li>Aplicar hotfix a múltiples ramas</li>
+                                <li>Mover commits entre ramas</li>
+                                <li>Recuperar commits perdidos</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div>
+                        <svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="80" cy="150" r="30" fill="#ccc" stroke="#333" stroke-width="2"/>
+                            <circle cx="180" cy="150" r="30" fill="#ccc" stroke="#333" stroke-width="2"/>
+                            <circle cx="280" cy="150" r="30" fill="#ccc" stroke="#333" stroke-width="2"/>
+                            <line x1="110" y1="150" x2="150" y2="150" stroke="#333" stroke-width="2"/>
+                            <line x1="210" y1="150" x2="250" y2="150" stroke="#333" stroke-width="2"/>
+                            <circle cx="180" cy="70" r="30" fill="#FF6B6B" stroke="#333" stroke-width="2"/>
+                            <line x1="180" y1="100" x2="180" y2="120" stroke="#333" stroke-width="2"/>
+                            <circle cx="280" cy="70" r="30" fill="#4A90E2" stroke="#333" stroke-width="2"/>
+                            <path d="M 280 100 Q 280 120 280 120" stroke="#4A90E2" stroke-width="3" fill="none" stroke-dasharray="5,5"/>
+                            <text x="180" y="250" font-family="Inter" font-size="18" fill="#333" text-anchor="middle">main</text>
+                            <text x="180" y="40" font-family="Inter" font-size="18" fill="#333" text-anchor="middle">feature</text>
+                        </svg>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 24: Stash -->
+            <section>
+                <h2>GIT STASH</h2>
+                <p style="font-size: 0.85em;">Guarda temporalmente cambios sin hacer commit:</p>
+                <div style="font-size: 0.75em; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5em;">
+                    <div class="cmd-box">git stash</div>
+                    <div style="font-size: 0.95em; padding: 0.4em;">Guarda cambios actuales</div>
+                    <div class="cmd-box">git stash list</div>
+                    <div style="font-size: 0.95em; padding: 0.4em;">Lista stashes guardados</div>
+                    <div class="cmd-box">git stash pop</div>
+                    <div style="font-size: 0.95em; padding: 0.4em;">Aplica último stash y elimina</div>
+                    <div class="cmd-box">git stash apply</div>
+                    <div style="font-size: 0.95em; padding: 0.4em;">Aplica sin eliminar</div>
+                    <div class="cmd-box">git stash drop</div>
+                    <div style="font-size: 0.95em; padding: 0.4em;">Elimina un stash</div>
+                    <div class="cmd-box">git stash clear</div>
+                    <div style="font-size: 0.95em; padding: 0.4em;">Elimina todos los stashes</div>
+                </div>
+                <div class="highlight-box" style="margin-top: 0.5em; font-size: 0.8em;">
+                    <strong>Ejemplo:</strong> Cambiar rápidamente de rama sin perder trabajo en progreso.
+                </div>
+            </section>
+
+            <!-- Slide 25: Reset vs Revert -->
+            <section>
+                <h2>GIT RESET VS REVERT</h2>
+                <table style="margin-top: 0.5em;">
+                    <thead>
+                        <tr>
+                            <th>Comando</th>
+                            <th>Descripción</th>
+                            <th>Historial</th>
+                            <th>Uso</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>git reset --soft</code></td>
+                            <td>Mueve HEAD, mantiene cambios en staging</td>
+                            <td>Reescribe</td>
+                            <td>Deshacer último commit</td>
+                        </tr>
+                        <tr>
+                            <td><code>git reset --mixed</code></td>
+                            <td>Mueve HEAD, cambios a working dir</td>
+                            <td>Reescribe</td>
+                            <td>Unstage archivos</td>
+                        </tr>
+                        <tr>
+                            <td><code>git reset --hard</code></td>
+                            <td>Mueve HEAD, descarta cambios</td>
+                            <td>Reescribe</td>
+                            <td>Descartar todo</td>
+                        </tr>
+                        <tr>
+                            <td><code>git revert</code></td>
+                            <td>Crea nuevo commit que revierte cambios</td>
+                            <td>Preserva</td>
+                            <td>Revertir en ramas públicas</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Slide 26: Hooks -->
+            <section>
+                <h2>GIT HOOKS</h2>
+                <div style="font-size: 0.8em;">
+                    <p>Scripts que se ejecutan automáticamente en eventos de Git:</p>
+                    <div class="two-columns" style="margin-top: 0.5em; gap: 1em;">
+                        <div>
+                            <h3 style="font-size: 0.95em;">Client-side hooks</h3>
+                            <ul class="compact-list" style="font-size: 0.9em;">
+                                <li><code>pre-commit</code> - antes del commit</li>
+                                <li><code>prepare-commit-msg</code> - editar mensaje</li>
+                                <li><code>commit-msg</code> - validar mensaje</li>
+                                <li><code>post-commit</code> - después del commit</li>
+                                <li><code>pre-push</code> - antes de push</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 0.95em;">Server-side hooks</h3>
+                            <ul class="compact-list" style="font-size: 0.9em;">
+                                <li><code>pre-receive</code> - antes de recibir push</li>
+                                <li><code>update</code> - por cada rama</li>
+                                <li><code>post-receive</code> - después del push</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="highlight-box" style="margin-top: 0.5em; font-size: 0.85em;">
+                        <strong>Ejemplos:</strong> Ejecutar tests antes de commit, validar formato de mensaje, linters, CI/CD triggers.
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 27: Tags -->
+            <section>
+                <h2>GIT TAGS</h2>
+                <p style="font-size: 0.85em;">Marcan puntos específicos en el historial (versiones, releases):</p>
+                <div style="font-size: 0.75em;">
+                    <div class="two-columns" style="gap: 1em;">
+                        <div>
+                            <h3 style="font-size: 0.95em;">Lightweight tags</h3>
+                            <div class="cmd-box">git tag v1.0.0</div>
+                            <p style="font-size: 0.9em; margin-top: 0.3em;">Solo un puntero a un commit</p>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 0.95em;">Annotated tags</h3>
+                            <div class="cmd-box">git tag -a v1.0.0 -m "Release 1.0"</div>
+                            <p style="font-size: 0.9em; margin-top: 0.3em;">Objeto completo con metadata</p>
+                        </div>
+                    </div>
+                    <div class="cmd-box" style="margin-top: 0.5em;">git push origin v1.0.0</div>
+                    <div class="cmd-box">git push --tags</div>
+                </div>
+                <div class="highlight-box" style="margin-top: 0.5em; font-size: 0.8em;">
+                    <strong>Semantic Versioning:</strong> MAJOR.MINOR.PATCH (ej: 2.3.1)
+                </div>
+            </section>
+
+            <!-- Slide 28: Submodules -->
+            <section>
+                <h2>GIT SUBMODULES</h2>
+                <p style="font-size: 0.85em;">Incluir repositorios Git dentro de otros repositorios:</p>
+                <div style="font-size: 0.75em;">
+                    <div class="cmd-box">git submodule add https://github.com/user/repo.git path/to/submodule</div>
+                    <div class="cmd-box">git submodule init</div>
+                    <div class="cmd-box">git submodule update</div>
+                    <div class="highlight-box" style="margin-top: 0.8em;">
+                        <p><strong>Casos de uso:</strong></p>
+                        <ul class="compact-list" style="font-size: 0.9em;">
+                            <li>Compartir bibliotecas entre proyectos</li>
+                            <li>Gestionar dependencias externas</li>
+                            <li>Separar componentes grandes</li>
+                        </ul>
+                    </div>
+                    <div class="highlight-box" style="margin-top: 0.5em;">
+                        <p><strong>Alternativa moderna:</strong> Git subtree (más simple, sin archivos .gitmodules)</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 29: .gitignore -->
+            <section>
+                <h2>.GITIGNORE</h2>
+                <div class="two-columns">
+                    <div style="font-size: 0.8em;">
+                        <p>Archivos/directorios que Git debe <strong>ignorar</strong>:</p>
+                        <ul class="compact-list" style="margin-top: 0.5em;">
+                            <li>Compilados - <code>*.class</code>, <code>*.o</code></li>
+                            <li>Dependencias - <code>node_modules/</code></li>
+                            <li>Configuración local</li>
+                            <li>Logs y temporales</li>
+                            <li>Credenciales y secrets</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <pre style="font-size: 0.55em;"><code># Compiled
+*.class
+*.pyc
+*.o
+
+# Dependencies
+node_modules/
+venv/
+__pycache__/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Env & Secrets
+.env
+.env.local
+credentials.json
+*.key
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Meme: Git Ignore -->
+            <section style="text-align: center;">
+                <h3 style="font-size: 1.5em; color: var(--navy); margin-bottom: 0.5em;">"Cuando olvidas el .gitignore y subes node_modules/"</h3>
+                <div style="font-size: 8em; margin: 0.3em 0;">😱</div>
+                <div class="highlight-box" style="font-size: 1.2em; margin: 1em auto; max-width: 600px;">
+                    <p><strong>GitHub:</strong> "Tu repositorio ahora pesa 2.5 GB"</p>
+                    <p style="margin-top: 0.5em; font-size: 0.9em; color: var(--gris-oscuro);">Pro tip: Siempre crea el .gitignore ANTES del primer commit 🙏</p>
+                </div>
+            </section>
+
+            <!-- Slide 30: Workflow Típico -->
+            <section>
+                <h2>FLUJO DE TRABAJO TÍPICO</h2>
+                <div style="font-size: 0.7em;">
+                    <ol style="line-height: 1.6; background: rgba(139, 74, 43, 0.08); padding: 1em 1.5em 1em 2.5em; border-radius: 8px; margin: 0.5em 0;">
+                        <li><code>git clone URL</code> - Clonar repositorio</li>
+                        <li><code>git checkout -b feature/nueva-funcionalidad</code> - Crear rama</li>
+                        <li>Escribir código...</li>
+                        <li><code>git status</code> - Ver archivos modificados</li>
+                        <li><code>git diff</code> - Revisar cambios</li>
+                        <li><code>git add .</code> - Agregar al staging</li>
+                        <li><code>git commit -m "feat: descripción clara"</code> - Crear commit</li>
+                        <li><code>git push origin feature/nueva-funcionalidad</code> - Subir al remoto</li>
+                        <li>Crear Pull Request en GitHub/GitLab</li>
+                        <li>Revisión de código (Code Review)</li>
+                        <li>Merge a main/develop</li>
+                        <li><code>git checkout main && git pull</code> - Actualizar local</li>
+                    </ol>
+                </div>
+            </section>
+
+            <!-- Slide 31: Buenas Prácticas -->
+            <section>
+                <h2>BUENAS PRÁCTICAS</h2>
+                <div style="font-size: 0.75em; columns: 2; column-gap: 1.5em;">
+                    <ul class="compact-list">
+                        <li>Commits pequeños y atómicos</li>
+                        <li>Mensajes descriptivos (<a href="https://www.conventionalcommits.org/">Conventional Commits</a>)</li>
+                        <li>Una rama por funcionalidad</li>
+                        <li>Pull/fetch antes de push</li>
+                        <li>Revisar cambios con <code>git diff</code></li>
+                        <li>No commitear archivos generados</li>
+                        <li>Usar <code>.gitignore</code></li>
+                        <li>Mantener main/master estable</li>
+                        <li>Hacer rebase de ramas locales</li>
+                        <li>NO hacer rebase de ramas públicas</li>
+                        <li>Code review antes de merge</li>
+                        <li>Tags para versiones</li>
+                        <li>Documentar en README</li>
+                        <li>CI/CD con hooks</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Slide 32: Conventional Commits -->
+            <section>
+                <h2>CONVENTIONAL COMMITS</h2>
+                <p style="font-size: 0.85em;">Formato estándar para mensajes de commit:</p>
+                <div class="cmd-box" style="font-size: 0.8em;">tipo(scope): descripción corta</div>
+                <table style="margin-top: 0.5em; font-size: 0.7em;">
+                    <tr><td><code>feat</code></td><td>Nueva funcionalidad</td></tr>
+                    <tr><td><code>fix</code></td><td>Corrección de bug</td></tr>
+                    <tr><td><code>docs</code></td><td>Documentación</td></tr>
+                    <tr><td><code>style</code></td><td>Formato, espacios (no afecta código)</td></tr>
+                    <tr><td><code>refactor</code></td><td>Refactorización de código</td></tr>
+                    <tr><td><code>test</code></td><td>Tests</td></tr>
+                    <tr><td><code>chore</code></td><td>Mantenimiento, build, deps</td></tr>
+                </table>
+                <div class="highlight-box" style="margin-top: 0.5em; font-size: 0.75em;">
+                    <strong>Ejemplos:</strong><br>
+                    <code>feat(api): agregar endpoint de usuarios</code><br>
+                    <code>fix(auth): corregir validación de tokens</code>
+                </div>
+            </section>
+
+            <!-- Slide 33: Comandos Avanzados -->
+            <section>
+                <h2>COMANDOS AVANZADOS</h2>
+                <div style="font-size: 0.65em; columns: 2; column-gap: 1em;">
+                    <div class="cmd-box">git reflog</div>
+                    <p style="margin: 0.2em 0;">Historial de referencias (recuperar commits)</p>
+                    <div class="cmd-box">git bisect</div>
+                    <p style="margin: 0.2em 0;">Búsqueda binaria de bugs</p>
+                    <div class="cmd-box">git blame archivo</div>
+                    <p style="margin: 0.2em 0;">Ver quién modificó cada línea</p>
+                    <div class="cmd-box">git show commit_hash</div>
+                    <p style="margin: 0.2em 0;">Mostrar detalles de un commit</p>
+                    <div class="cmd-box">git clean -fd</div>
+                    <p style="margin: 0.2em 0;">Eliminar archivos no rastreados</p>
+                    <div class="cmd-box">git log --graph --oneline</div>
+                    <p style="margin: 0.2em 0;">Historial visual compacto</p>
+                    <div class="cmd-box">git shortlog -sn</div>
+                    <p style="margin: 0.2em 0;">Estadísticas de commits por autor</p>
+                    <div class="cmd-box">git archive -o file.zip HEAD</div>
+                    <p style="margin: 0.2em 0;">Exportar código sin .git</p>
+                </div>
+            </section>
+
+            <!-- Slide 34: GitHub/GitLab Features -->
+            <section>
+                <h2>GITHUB / GITLAB</h2>
+                <div style="font-size: 0.75em;">
+                    <div class="two-columns">
+                        <div>
+                            <h3 style="font-size: 1em;">Pull Requests / Merge Requests</h3>
+                            <ul class="compact-list">
+                                <li>Code review colaborativo</li>
+                                <li>Discusión de cambios</li>
+                                <li>CI/CD automático</li>
+                                <li>Protección de ramas</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 1em;">Otras características</h3>
+                            <ul class="compact-list">
+                                <li>Issues y Project Boards</li>
+                                <li>GitHub Actions / GitLab CI</li>
+                                <li>Wikis y documentación</li>
+                                <li>GitHub Pages (hosting)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="cmd-box" style="margin-top: 0.5em;">gh pr create --title "feat: nueva funcionalidad"</div>
+                    <div class="cmd-box">gh pr list</div>
+                    <p style="font-size: 0.7em; color: #666; margin-top: 1em; text-align: right;">
+                        <a href="#/49" style="color: var(--accent-blue); text-decoration: none;">[KAL14]</a>
+                    </p>
+                </div>
+            </section>
+
+            <!-- Slide 35: CI/CD Introducción -->
+            <section>
+                <h2>CI/CD: INTEGRACIÓN Y ENTREGA CONTINUA</h2>
+                <div style="font-size: 0.8em;">
+                    <div class="two-columns">
+                        <div>
+                            <h3 style="font-size: 1em; color: var(--accent-blue);">Continuous Integration (CI)</h3>
+                            <ul class="compact-list">
+                                <li>Integrar código frecuentemente</li>
+                                <li>Tests automáticos en cada commit</li>
+                                <li>Build automático</li>
+                                <li>Detectar errores temprano</li>
+                                <li>Mantener código siempre listo</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 1em; color: var(--accent-blue);">Continuous Delivery/Deployment (CD)</h3>
+                            <ul class="compact-list">
+                                <li>Deploy automático a producción</li>
+                                <li>Releases frecuentes y seguras</li>
+                                <li>Rollback automático si falla</li>
+                                <li>Monitoreo post-deploy</li>
+                                <li>Feedback rápido</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="highlight-box" style="margin-top: 0.5em; font-size: 0.85em;">
+                        <strong>Pipeline típico:</strong> Push → Build → Test → Security Scan → Deploy → Monitor
+                    </div>
+                    <p style="font-size: 0.7em; color: #666; margin-top: 1em; text-align: right;">
+                        <a href="#/49" style="color: var(--accent-blue); text-decoration: none;">[DUV07]</a>
+                        <a href="#/49" style="color: var(--accent-blue); text-decoration: none;">[HUM10]</a>
+                    </p>
+                </div>
+            </section>
+
+            <!-- Slide 36: GitHub Actions Intro -->
+            <section>
+                <h2>GITHUB ACTIONS</h2>
+                <div style="font-size: 0.8em;">
+                    <p>Plataforma de automatización integrada en GitHub para CI/CD:</p>
+                    <div class="highlight-box" style="margin-top: 0.5em;">
+                        <p><strong>Componentes:</strong></p>
+                        <ul class="compact-list" style="font-size: 0.9em;">
+                            <li><strong>Workflows:</strong> Procesos automatizados (.github/workflows/*.yml)</li>
+                            <li><strong>Events:</strong> Triggers (push, pull_request, schedule, etc.)</li>
+                            <li><strong>Jobs:</strong> Conjunto de steps que se ejecutan</li>
+                            <li><strong>Steps:</strong> Tareas individuales (comandos o actions)</li>
+                            <li><strong>Actions:</strong> Bloques reutilizables de código</li>
+                            <li><strong>Runners:</strong> Servidores que ejecutan los workflows</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 37: GitHub Actions Ejemplo -->
+            <section>
+                <h2>GITHUB ACTIONS: EJEMPLO BÁSICO</h2>
+                <p style="font-size: 0.75em;"><code>.github/workflows/ci.yml</code></p>
+                <pre style="font-size: 0.5em;"><code>name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run linter
+      run: npm run lint
+
+    - name: Run tests
+      run: npm test
+
+    - name: Build application
+      run: npm run build</code></pre>
+            </section>
+
+            <!-- Slide 38: GitHub Actions Avanzado -->
+            <section>
+                <h2>GITHUB ACTIONS: FEATURES AVANZADAS</h2>
+                <div style="font-size: 0.7em;">
+                    <div class="two-columns" style="gap: 1em;">
+                        <div>
+                            <h3 style="font-size: 0.9em;">Matrix Strategy</h3>
+                            <pre style="font-size: 0.75em;"><code>strategy:
+  matrix:
+    node: [18, 20, 22]
+    os: [ubuntu, windows]
+runs-on: ${{ matrix.os }}-latest</code></pre>
+                            <h3 style="font-size: 0.9em; margin-top: 0.5em;">Secrets Management</h3>
+                            <pre style="font-size: 0.75em;"><code>env:
+  API_KEY: ${{ secrets.API_KEY }}
+  DB_PASSWORD: ${{ secrets.DB_PASS }}</code></pre>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 0.9em;">Artifacts & Caching</h3>
+                            <pre style="font-size: 0.75em;"><code>- uses: actions/upload-artifact@v4
+  with:
+    name: build-output
+    path: dist/
+
+- uses: actions/cache@v4
+  with:
+    path: ~/.npm
+    key: npm-${{ hashFiles('**/package-lock.json') }}</code></pre>
+                        </div>
+                    </div>
+                    <h3 style="font-size: 0.9em; margin-top: 0.5em;">Condicionales y Dependencias</h3>
+                    <pre style="font-size: 0.7em;"><code>deploy:
+  needs: [build, test]
+  if: github.ref == 'refs/heads/main'
+  runs-on: ubuntu-latest</code></pre>
+                </div>
+            </section>
+
+            <!-- Slide 39: GitHub Actions Marketplace -->
+            <section>
+                <h2>GITHUB ACTIONS: MARKETPLACE</h2>
+                <div style="font-size: 0.75em;">
+                    <p>Miles de actions reutilizables creadas por la comunidad:</p>
+                    <div style="columns: 2; column-gap: 1em; margin-top: 0.5em;">
+                        <div class="highlight-box">
+                            <strong>Testing:</strong><br>
+                            <code>codecov/codecov-action</code><br>
+                            <code>cypress-io/github-action</code>
+                        </div>
+                        <div class="highlight-box">
+                            <strong>Security:</strong><br>
+                            <code>aquasecurity/trivy-action</code><br>
+                            <code>snyk/actions</code>
+                        </div>
+                        <div class="highlight-box">
+                            <strong>Deploy:</strong><br>
+                            <code>aws-actions/configure-aws-credentials</code><br>
+                            <code>google-github-actions/deploy-cloud-run</code>
+                        </div>
+                        <div class="highlight-box">
+                            <strong>Docker:</strong><br>
+                            <code>docker/build-push-action</code><br>
+                            <code>docker/login-action</code>
+                        </div>
+                        <div class="highlight-box">
+                            <strong>Notificaciones:</strong><br>
+                            <code>slackapi/slack-github-action</code><br>
+                            <code>actions/github-script</code>
+                        </div>
+                        <div class="highlight-box">
+                            <strong>Release:</strong><br>
+                            <code>semantic-release/semantic-release</code><br>
+                            <code>softprops/action-gh-release</code>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 40: GitLab CI/CD -->
+            <section>
+                <h2>GITLAB CI/CD</h2>
+                <p style="font-size: 0.75em;">Configuración en <code>.gitlab-ci.yml</code></p>
+                <pre style="font-size: 0.5em;"><code>stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  DOCKER_IMAGE: myapp:$CI_COMMIT_SHORT_SHA
+
+build:
+  stage: build
+  image: node:20
+  script:
+    - npm ci
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+  cache:
+    paths:
+      - node_modules/
+
+test:
+  stage: test
+  script:
+    - npm run test
+    - npm run lint
+  coverage: '/Coverage: \d+\.\d+%/'
+
+deploy_production:
+  stage: deploy
+  script:
+    - docker build -t $DOCKER_IMAGE .
+    - docker push $DOCKER_IMAGE
+    - kubectl apply -f k8s/
+  only:
+    - main
+  environment:
+    name: production
+    url: https://myapp.com</code></pre>
+            </section>
+
+            <!-- Slide 41: Pipeline Completo -->
+            <section>
+                <h2>PIPELINE CI/CD COMPLETO</h2>
+                <div style="font-size: 0.7em;">
+                    <svg width="1200" height="400" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                                <polygon points="0 0, 10 3, 0 6" fill="#555"/>
+                            </marker>
+                        </defs>
+
+                        <!-- Push -->
+                        <rect x="20" y="150" width="100" height="60" fill="#4A90E2" rx="5"/>
+                        <text x="70" y="185" font-family="Inter" font-size="16" fill="white" text-anchor="middle" font-weight="600">GIT PUSH</text>
+
+                        <!-- Arrow 1 -->
+                        <line x1="125" y1="180" x2="165" y2="180" stroke="#555" stroke-width="3" marker-end="url(#arrowhead)"/>
+
+                        <!-- Build -->
+                        <rect x="170" y="150" width="100" height="60" fill="#8BC34A" rx="5"/>
+                        <text x="220" y="185" font-family="Inter" font-size="16" fill="white" text-anchor="middle" font-weight="600">BUILD</text>
+
+                        <!-- Arrow 2 -->
+                        <line x1="275" y1="180" x2="315" y2="180" stroke="#555" stroke-width="3" marker-end="url(#arrowhead)"/>
+
+                        <!-- Test -->
+                        <rect x="320" y="150" width="100" height="60" fill="#FFC107" rx="5"/>
+                        <text x="370" y="185" font-family="Inter" font-size="16" fill="white" text-anchor="middle" font-weight="600">TEST</text>
+
+                        <!-- Arrow 3 -->
+                        <line x1="425" y1="180" x2="465" y2="180" stroke="#555" stroke-width="3" marker-end="url(#arrowhead)"/>
+
+                        <!-- Security -->
+                        <rect x="470" y="150" width="100" height="60" fill="#FF9800" rx="5"/>
+                        <text x="520" y="185" font-family="Inter" font-size="16" fill="white" text-anchor="middle" font-weight="600">SECURITY</text>
+
+                        <!-- Arrow 4 -->
+                        <line x1="575" y1="180" x2="615" y2="180" stroke="#555" stroke-width="3" marker-end="url(#arrowhead)"/>
+
+                        <!-- Quality -->
+                        <rect x="620" y="150" width="100" height="60" fill="#9C27B0" rx="5"/>
+                        <text x="670" y="185" font-family="Inter" font-size="16" fill="white" text-anchor="middle" font-weight="600">QUALITY</text>
+
+                        <!-- Arrow 5 -->
+                        <line x1="725" y1="180" x2="765" y2="180" stroke="#555" stroke-width="3" marker-end="url(#arrowhead)"/>
+
+                        <!-- Deploy -->
+                        <rect x="770" y="150" width="100" height="60" fill="#F44336" rx="5"/>
+                        <text x="820" y="185" font-family="Inter" font-size="16" fill="white" text-anchor="middle" font-weight="600">DEPLOY</text>
+
+                        <!-- Arrow 6 -->
+                        <line x1="875" y1="180" x2="915" y2="180" stroke="#555" stroke-width="3" marker-end="url(#arrowhead)"/>
+
+                        <!-- Monitor -->
+                        <rect x="920" y="150" width="100" height="60" fill="#00BCD4" rx="5"/>
+                        <text x="970" y="185" font-family="Inter" font-size="16" fill="white" text-anchor="middle" font-weight="600">MONITOR</text>
+
+                        <!-- Labels -->
+                        <text x="220" y="240" font-family="Inter" font-size="12" fill="#666" text-anchor="middle">Compilar código</text>
+                        <text x="370" y="240" font-family="Inter" font-size="12" fill="#666" text-anchor="middle">Unit + Integration</text>
+                        <text x="520" y="240" font-family="Inter" font-size="12" fill="#666" text-anchor="middle">SAST, Deps scan</text>
+                        <text x="670" y="240" font-family="Inter" font-size="12" fill="#666" text-anchor="middle">Linting, Coverage</text>
+                        <text x="820" y="240" font-family="Inter" font-size="12" fill="#666" text-anchor="middle">Staging/Prod</text>
+                        <text x="970" y="240" font-family="Inter" font-size="12" fill="#666" text-anchor="middle">Logs, Metrics</text>
+                    </svg>
+                </div>
+                <div class="highlight-box" style="font-size: 0.75em; margin-top: 0.5em;">
+                    <strong>Feedback rápido:</strong> Si alguna etapa falla, el pipeline se detiene y notifica al equipo.
+                </div>
+            </section>
+
+            <!-- Slide 42: Testing en CI/CD -->
+            <section>
+                <h2>TESTING EN PIPELINES</h2>
+                <div style="font-size: 0.75em;">
+                    <div class="two-columns">
+                        <div>
+                            <h3 style="font-size: 0.95em;">Tipos de Tests</h3>
+                            <ul class="compact-list">
+                                <li><strong>Unit Tests:</strong> Componentes aislados</li>
+                                <li><strong>Integration Tests:</strong> Módulos juntos</li>
+                                <li><strong>E2E Tests:</strong> Flujo completo de usuario</li>
+                                <li><strong>Performance Tests:</strong> Carga y estrés</li>
+                                <li><strong>Security Tests:</strong> Vulnerabilidades</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 0.95em;">Cobertura de Código</h3>
+                            <pre style="font-size: 0.65em;"><code>- name: Run tests with coverage
+  run: npm test -- --coverage
+
+- name: Upload to Codecov
+  uses: codecov/codecov-action@v4
+  with:
+    files: ./coverage/lcov.info
+    fail_ci_if_error: true</code></pre>
+                        </div>
+                    </div>
+                    <div class="highlight-box" style="margin-top: 0.5em;">
+                        <strong>Test Pyramid:</strong> Muchos unit tests, menos integration tests, pocos E2E tests
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 43: Security Scanning -->
+            <section>
+                <h2>SECURITY SCANNING EN CI/CD</h2>
+                <div style="font-size: 0.75em;">
+                    <div class="two-columns">
+                        <div>
+                            <h3 style="font-size: 0.95em;">SAST (Static Analysis)</h3>
+                            <pre style="font-size: 0.6em;"><code>- name: Run SAST
+  uses: github/codeql-action/analyze@v3
+
+- name: SonarQube Scan
+  uses: sonarsource/sonarqube-scan-action@master
+  env:
+    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}</code></pre>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 0.95em;">Dependency Scanning</h3>
+                            <pre style="font-size: 0.6em;"><code>- name: Run Snyk
+  uses: snyk/actions/node@master
+  env:
+    SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+- name: OWASP Dependency Check
+  run: dependency-check --scan ./ --format JSON</code></pre>
+                        </div>
+                    </div>
+                    <div class="two-columns" style="margin-top: 0.5em;">
+                        <div>
+                            <h3 style="font-size: 0.95em;">Container Scanning</h3>
+                            <pre style="font-size: 0.6em;"><code>- name: Trivy scan
+  uses: aquasecurity/trivy-action@master
+  with:
+    image-ref: 'myapp:latest'
+    severity: 'CRITICAL,HIGH'</code></pre>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 0.95em;">Secret Detection</h3>
+                            <pre style="font-size: 0.6em;"><code>- name: GitGuardian scan
+  uses: GitGuardian/ggshield-action@master
+  env:
+    GITGUARDIAN_API_KEY: ${{ secrets.GG_KEY }}</code></pre>
+                        </div>
+                    </div>
+                    <p style="font-size: 0.7em; color: #666; margin-top: 1em; text-align: right;">
+                        <a href="#/49" style="color: var(--accent-blue); text-decoration: none;">[LWA16]</a>
+                        <a href="#/49" style="color: var(--accent-blue); text-decoration: none;">[RAH16]</a>
+                    </p>
+                </div>
+            </section>
+
+            <!-- Slide 44: Deployment Strategies -->
+            <section>
+                <h2>ESTRATEGIAS DE DEPLOYMENT</h2>
+                <div style="font-size: 0.75em;">
+                    <table style="font-size: 0.9em;">
+                        <thead>
+                            <tr>
+                                <th>Estrategia</th>
+                                <th>Descripción</th>
+                                <th>Ventajas</th>
+                                <th>Desventajas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Rolling</strong></td>
+                                <td>Actualización gradual de instancias</td>
+                                <td>Sin downtime</td>
+                                <td>Lento, dos versiones corriendo</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Blue-Green</strong></td>
+                                <td>Dos entornos idénticos, swap rápido</td>
+                                <td>Rollback instantáneo</td>
+                                <td>Requiere doble infraestructura</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Canary</strong></td>
+                                <td>Deploy a pequeño % de usuarios primero</td>
+                                <td>Reduce riesgo, feedback rápido</td>
+                                <td>Complejo, requiere monitoreo</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Feature Flags</strong></td>
+                                <td>Activar/desactivar features en runtime</td>
+                                <td>Deploy != Release, A/B testing</td>
+                                <td>Deuda técnica si no se limpian</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Slide 45: Environments -->
+            <section>
+                <h2>GESTIÓN DE ENTORNOS</h2>
+                <div style="font-size: 0.75em;">
+                    <div class="two-columns">
+                        <div>
+                            <h3 style="font-size: 0.95em;">Ambientes Típicos</h3>
+                            <ul class="compact-list">
+                                <li><strong>Development</strong> - Desarrollo local</li>
+                                <li><strong>Testing/QA</strong> - Tests automáticos</li>
+                                <li><strong>Staging</strong> - Réplica de producción</li>
+                                <li><strong>Production</strong> - Usuarios reales</li>
+                            </ul>
+                            <div class="highlight-box" style="margin-top: 0.5em; font-size: 0.9em;">
+                                <strong>Principio:</strong> Todos los ambientes deben ser idénticos (Infrastructure as Code)
+                            </div>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 0.95em;">GitHub Environments</h3>
+                            <pre style="font-size: 0.65em;"><code>deploy:
+  runs-on: ubuntu-latest
+  environment:
+    name: production
+    url: https://myapp.com
+  steps:
+    - name: Deploy to prod
+      run: ./deploy.sh
+      env:
+        API_KEY: ${{ secrets.PROD_API_KEY }}
+        DB_URL: ${{ secrets.PROD_DB_URL }}</code></pre>
+                            <p style="font-size: 0.85em; margin-top: 0.3em;">+ Protection rules (approvals, wait timers)</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 46: Monitoring & Observability -->
+            <section>
+                <h2>MONITORING & OBSERVABILITY</h2>
+                <div style="font-size: 0.75em;">
+                    <div class="two-columns">
+                        <div>
+                            <h3 style="font-size: 0.95em;">Los 3 Pilares</h3>
+                            <ul class="compact-list">
+                                <li><strong>Logs</strong> - Qué pasó (eventos)</li>
+                                <li><strong>Metrics</strong> - Qué tan bien (KPIs)</li>
+                                <li><strong>Traces</strong> - Flujo de requests</li>
+                            </ul>
+                            <div class="highlight-box" style="margin-top: 0.5em; font-size: 0.9em;">
+                                <p><strong>Herramientas populares:</strong></p>
+                                <ul class="compact-list">
+                                    <li>Prometheus + Grafana (metrics)</li>
+                                    <li>ELK Stack (logs)</li>
+                                    <li>Jaeger/Zipkin (traces)</li>
+                                    <li>Datadog, New Relic (all-in-one)</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 0.95em;">Health Checks en Pipeline</h3>
+                            <pre style="font-size: 0.6em;"><code>- name: Wait for deployment
+  run: |
+    for i in {1..30}; do
+      if curl -f https://myapp.com/health; then
+        echo "App is healthy!"
+        exit 0
+      fi
+      sleep 10
+    done
+    exit 1
+
+- name: Smoke tests
+  run: npm run test:smoke
+
+- name: Rollback if unhealthy
+  if: failure()
+  run: kubectl rollout undo deployment/myapp</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 47: Best Practices CI/CD -->
+            <section>
+                <h2>BUENAS PRÁCTICAS CI/CD</h2>
+                <div style="font-size: 0.7em; columns: 2; column-gap: 1.5em;">
+                    <ul class="compact-list">
+                        <li>Pipeline rápido (&lt;10 min ideal)</li>
+                        <li>Fail fast - fallar temprano</li>
+                        <li>Tests determinísticos (no flaky)</li>
+                        <li>Pipeline como código (versionado)</li>
+                        <li>Paralelizar jobs cuando sea posible</li>
+                        <li>Cachear dependencias</li>
+                        <li>Build once, deploy many</li>
+                        <li>Immutable artifacts (Docker images)</li>
+                        <li>Secrets en variables de entorno</li>
+                        <li>Never commit secrets</li>
+                        <li>Automated rollback si falla</li>
+                        <li>Notificaciones claras (Slack, email)</li>
+                        <li>Logs estructurados y centralizados</li>
+                        <li>Métricas de pipeline (success rate, duration)</li>
+                        <li>Code review antes de merge</li>
+                        <li>Branch protection rules</li>
+                        <li>Semantic versioning automático</li>
+                        <li>Changelog generado automáticamente</li>
+                    </ul>
+                    <p style="font-size: 0.7em; color: #666; margin-top: 1em; text-align: right;">
+                        <a href="#/49" style="color: var(--accent-blue); text-decoration: none;">[DUV07]</a>
+                        <a href="#/49" style="color: var(--accent-blue); text-decoration: none;">[HUM10]</a>
+                        <a href="#/49" style="color: var(--accent-blue); text-decoration: none;">[LWA16]</a>
+                        <a href="#/49" style="color: var(--accent-blue); text-decoration: none;">[RAH16]</a>
+                    </p>
+                </div>
+            </section>
+
+            <!-- Slide 48: Recursos -->
+            <section>
+                <h2>RECURSOS Y DOCUMENTACIÓN</h2>
+                <div style="font-size: 0.7em; columns: 2; column-gap: 1em;">
+                    <div class="highlight-box">
+                        <strong>Git - Documentación Oficial:</strong><br>
+                        <a href="https://git-scm.com/doc" style="color: var(--accent-blue);">https://git-scm.com/doc</a>
+                    </div>
+                    <div class="highlight-box">
+                        <strong>Pro Git Book (español):</strong><br>
+                        <a href="https://git-scm.com/book/es/v2" style="color: var(--accent-blue);">https://git-scm.com/book/es/v2</a>
+                    </div>
+                    <div class="highlight-box">
+                        <strong>Visualizar Git:</strong><br>
+                        <a href="https://git-school.github.io/visualizing-git/" style="color: var(--accent-blue);">https://git-school.github.io/visualizing-git/</a>
+                    </div>
+                    <div class="highlight-box">
+                        <strong>Aprender Git (interactivo):</strong><br>
+                        <a href="https://learngitbranching.js.org/?locale=es_ES" style="color: var(--accent-blue);">https://learngitbranching.js.org/</a>
+                    </div>
+                    <div class="highlight-box">
+                        <strong>Oh Shit, Git!:</strong><br>
+                        <a href="https://ohshitgit.com/es" style="color: var(--accent-blue);">https://ohshitgit.com/es</a>
+                    </div>
+                    <div class="highlight-box">
+                        <strong>GitHub Actions Docs:</strong><br>
+                        <a href="https://docs.github.com/actions" style="color: var(--accent-blue);">https://docs.github.com/actions</a>
+                    </div>
+                    <div class="highlight-box">
+                        <strong>GitLab CI/CD Docs:</strong><br>
+                        <a href="https://docs.gitlab.com/ee/ci/" style="color: var(--accent-blue);">https://docs.gitlab.com/ee/ci/</a>
+                    </div>
+                    <div class="highlight-box">
+                        <strong>Conventional Commits:</strong><br>
+                        <a href="https://www.conventionalcommits.org/" style="color: var(--accent-blue);">https://www.conventionalcommits.org/</a>
+                    </div>
+                    <div class="highlight-box">
+                        <strong>Semantic Versioning:</strong><br>
+                        <a href="https://semver.org/" style="color: var(--accent-blue);">https://semver.org/</a>
+                    </div>
+                    <div class="highlight-box">
+                        <strong>CI/CD Best Practices:</strong><br>
+                        <a href="https://www.atlassian.com/continuous-delivery" style="color: var(--accent-blue);">Atlassian CI/CD Guide</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 49: Bibliografía -->
+            <section>
+                <h2>BIBLIOGRAFÍA Y PAPERS</h2>
+                <div style="font-size: 0.65em; columns: 2; column-gap: 1.5em;">
+                    <div class="highlight-box" style="break-inside: avoid; margin-bottom: 0.8em;">
+                        <strong>[BIR09]</strong> <strong>Bird, C., Rigby, P. C., Barr, E. T., et al. (2009).</strong><br>
+                        "The promises and perils of mining Git"<br>
+                        <em>6th IEEE International Working Conference on Mining Software Repositories (MSR)</em>.<br>
+                        DOI: 10.1109/MSR.2009.5069475
+                    </div>
+                    <div class="highlight-box" style="break-inside: avoid; margin-bottom: 0.8em;">
+                        <strong>[SPI05]</strong> <strong>Spinellis, D. (2005).</strong><br>
+                        "Version control systems"<br>
+                        <em>IEEE Software, 22(5)</em>, pp. 108-109.<br>
+                        DOI: 10.1109/MS.2005.140
+                    </div>
+                    <div class="highlight-box" style="break-inside: avoid; margin-bottom: 0.8em;">
+                        <strong>[DUV07]</strong> <strong>Duvall, P. M., Matyas, S., & Glover, A. (2007).</strong><br>
+                        "Continuous Integration: Improving Software Quality and Reducing Risk"<br>
+                        <em>Addison-Wesley Professional</em>.<br>
+                        ISBN: 978-0321336385
+                    </div>
+                    <div class="highlight-box" style="break-inside: avoid; margin-bottom: 0.8em;">
+                        <strong>[HUM10]</strong> <strong>Humble, J., & Farley, D. (2010).</strong><br>
+                        "Continuous Delivery: Reliable Software Releases through Build, Test, and Deployment Automation"<br>
+                        <em>Addison-Wesley Professional</em>.<br>
+                        ISBN: 978-0321601919
+                    </div>
+                    <div class="highlight-box" style="break-inside: avoid; margin-bottom: 0.8em;">
+                        <strong>[CHA14]</strong> <strong>Chacon, S., & Straub, B. (2014).</strong><br>
+                        "Pro Git" (2nd Edition)<br>
+                        <em>Apress</em>. Open access at <a href="https://git-scm.com/book" style="color: var(--accent-blue);">git-scm.com/book</a>
+                    </div>
+                    <div class="highlight-box" style="break-inside: avoid; margin-bottom: 0.8em;">
+                        <strong>[KAL14]</strong> <strong>Kalliamvakou, E., Gousios, G., et al. (2014).</strong><br>
+                        "The promises and perils of mining GitHub"<br>
+                        <em>11th Working Conference on Mining Software Repositories</em>.<br>
+                        DOI: 10.1145/2597073.2597074
+                    </div>
+                    <div class="highlight-box" style="break-inside: avoid; margin-bottom: 0.8em;">
+                        <strong>[LWA16]</strong> <strong>Lwakatare, L. E., Kuvaja, P., & Oivo, M. (2016).</strong><br>
+                        "An exploratory study of DevOps extending the dimensions of DevOps with practices"<br>
+                        <em>The Eleventh International Conference on Software Engineering Advances</em>.
+                    </div>
+                    <div class="highlight-box" style="break-inside: avoid; margin-bottom: 0.8em;">
+                        <strong>[RAH16]</strong> <strong>Rahman, A. A., & Williams, L. (2016).</strong><br>
+                        "Software security in DevOps: Synthesizing practitioners' perceptions and practices"<br>
+                        <em>International Workshop on Continuous Software Evolution and Delivery</em>.<br>
+                        DOI: 10.1145/2896941.2896946
+                    </div>
+                    <div class="highlight-box" style="break-inside: avoid; margin-bottom: 0.8em;">
+                        <strong>Zampetti, F., Scalabrino, S., et al. (2017).</strong><br>
+                        "How open source projects use static code analysis tools in continuous integration pipelines"<br>
+                        <em>14th International Conference on Mining Software Repositories</em>.<br>
+                        DOI: 10.1109/MSR.2017.2
+                    </div>
+                    <div class="highlight-box" style="break-inside: avoid; margin-bottom: 0.8em;">
+                        <strong>Forsgren, N., Humble, J., & Kim, G. (2018).</strong><br>
+                        "Accelerate: The Science of Lean Software and DevOps"<br>
+                        <em>IT Revolution Press</em>.<br>
+                        ISBN: 978-1942788331
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 50: Cierre -->
+            <section class="title-slide">
+                <h1 style="margin-top: 1.5em;">¿PREGUNTAS?</h1>
+                <div class="image-center" style="margin-top: 1.5em;">
+                    <img src="https://media.giphy.com/media/3o7TKTDn976rzVgky4/giphy.gif" alt="Questions" style="max-height: 250px;">
+                </div>
+                <div style="margin-top: 2em;">
+                    <p class="subtitle">Diplomatura de Posgrado en Desarrollo de Soluciones de Inteligencia Artificial Generativa en la Nube<br>Departamento de Ciencias Básicas<br>Universidad Nacional de Luján</p>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- Botón de menú lateral -->
+    <button class="menu-button" id="menuButton" title="Ver índice (o presiona 'M')">☰</button>
+
+    <!-- Botón de índice -->
+    <button class="index-button" id="indexButton" title="Ir al índice (Slide 2)">📋 Índice</button>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Panel de navegación -->
+    <div class="nav-panel" id="navPanel">
+        <div class="nav-panel-header">
+            <h3>📋 Control de Versiones con GIT</h3>
+            <p style="color: white; font-size: 0.8em; margin-top: 5px;">50 slides - Git + CI/CD</p>
+            <button class="close-button" id="closeButton">✕</button>
+        </div>
+        <ul class="nav-list">
+            <li class="nav-section">Introducción</li>
+            <li class="nav-item" data-slide="0">
+                <span class="nav-item-number">1</span>
+                <span class="nav-item-title">Portada</span>
+            </li>
+            <li class="nav-item" data-slide="1">
+                <span class="nav-item-number">2</span>
+                <span class="nav-item-title">Índice de Contenidos</span>
+            </li>
+
+            <li class="nav-section">Fundamentos de Git</li>
+            <li class="nav-item" data-slide="2">
+                <span class="nav-item-number">3</span>
+                <span class="nav-item-title">Motivación (1) - Archivos caóticos</span>
+            </li>
+            <li class="nav-item" data-slide="3">
+                <span class="nav-item-number">4</span>
+                <span class="nav-item-title">Motivación (2) - Problemas colaborativos</span>
+            </li>
+            <li class="nav-item" data-slide="4">
+                <span class="nav-item-number">5</span>
+                <span class="nav-item-title">¿Qué es el Control de Versiones?</span>
+            </li>
+            <li class="nav-item" data-slide="5">
+                <span class="nav-item-number">6</span>
+                <span class="nav-item-title">Ventajas del Control de Versiones</span>
+            </li>
+            <li class="nav-item" data-slide="6">
+                <span class="nav-item-number">7</span>
+                <span class="nav-item-title">Git: Principios Fundamentales</span>
+            </li>
+            <li class="nav-item" data-slide="7">
+                <span class="nav-item-number">8</span>
+                <span class="nav-item-title">Las Tres Secciones</span>
+            </li>
+            <li class="nav-item" data-slide="8">
+                <span class="nav-item-number">9</span>
+                <span class="nav-item-title">Staging Area: Escenario de la Foto</span>
+            </li>
+            <li class="nav-item" data-slide="9">
+                <span class="nav-item-number">10</span>
+                <span class="nav-item-title">Staging Area: Flujo de Trabajo</span>
+            </li>
+            <li class="nav-item" data-slide="10">
+                <span class="nav-item-number">11</span>
+                <span class="nav-item-title">Git: Flujo de Trabajo</span>
+            </li>
+
+            <li class="nav-section">Branches & Merge</li>
+            <li class="nav-item" data-slide="11">
+                <span class="nav-item-number">12</span>
+                <span class="nav-item-title">Repositorio: Rama</span>
+            </li>
+            <li class="nav-item" data-slide="12">
+                <span class="nav-item-number">13</span>
+                <span class="nav-item-title">Branches: Trabajar en Paralelo</span>
+            </li>
+            <li class="nav-item" data-slide="13">
+                <span class="nav-item-number">14</span>
+                <span class="nav-item-title">Comandos Básicos</span>
+            </li>
+            <li class="nav-item" data-slide="14">
+                <span class="nav-item-number">15</span>
+                <span class="nav-item-title">Merge: Fusionar Ramas</span>
+            </li>
+            <li class="nav-item" data-slide="15">
+                <span class="nav-item-number">16</span>
+                <span class="nav-item-title">Conflictos de Merge</span>
+            </li>
+
+            <li class="nav-section">Estrategias de Branching</li>
+            <li class="nav-item" data-slide="16">
+                <span class="nav-item-number">17</span>
+                <span class="nav-item-title">Estrategias de Branching</span>
+            </li>
+            <li class="nav-item" data-slide="17">
+                <span class="nav-item-number">18</span>
+                <span class="nav-item-title">Git Flow: Diagrama</span>
+            </li>
+            <li class="nav-item" data-slide="18">
+                <span class="nav-item-number">19</span>
+                <span class="nav-item-title">Git Rebase</span>
+            </li>
+            <li class="nav-item" data-slide="19">
+                <span class="nav-item-number">20</span>
+                <span class="nav-item-title">Rebase Interactivo</span>
+            </li>
+            <li class="nav-item" data-slide="20">
+                <span class="nav-item-number">21</span>
+                <span class="nav-item-title">Git Cherry-pick</span>
+            </li>
+            <li class="nav-item" data-slide="21">
+                <span class="nav-item-number">22</span>
+                <span class="nav-item-title">Git Stash</span>
+            </li>
+            <li class="nav-item" data-slide="22">
+                <span class="nav-item-number">23</span>
+                <span class="nav-item-title">Git Reset vs Revert</span>
+            </li>
+
+            <li class="nav-section">Herramientas & Hooks</li>
+            <li class="nav-item" data-slide="23">
+                <span class="nav-item-number">24</span>
+                <span class="nav-item-title">Git Hooks</span>
+            </li>
+            <li class="nav-item" data-slide="24">
+                <span class="nav-item-number">25</span>
+                <span class="nav-item-title">Git Tags</span>
+            </li>
+            <li class="nav-item" data-slide="25">
+                <span class="nav-item-number">26</span>
+                <span class="nav-item-title">Git Submodules</span>
+            </li>
+            <li class="nav-item" data-slide="26">
+                <span class="nav-item-number">27</span>
+                <span class="nav-item-title">.gitignore</span>
+            </li>
+            <li class="nav-item" data-slide="28">
+                <span class="nav-item-number">28</span>
+                <span class="nav-item-title">Flujo de Trabajo Típico</span>
+            </li>
+            <li class="nav-item" data-slide="29">
+                <span class="nav-item-number">29</span>
+                <span class="nav-item-title">Buenas Prácticas</span>
+            </li>
+            <li class="nav-item" data-slide="30">
+                <span class="nav-item-number">30</span>
+                <span class="nav-item-title">Conventional Commits</span>
+            </li>
+            <li class="nav-item" data-slide="31">
+                <span class="nav-item-number">31</span>
+                <span class="nav-item-title">Comandos Avanzados</span>
+            </li>
+
+            <li class="nav-section">GitHub / GitLab</li>
+            <li class="nav-item" data-slide="32">
+                <span class="nav-item-number">32</span>
+                <span class="nav-item-title">GitHub / GitLab</span>
+            </li>
+
+            <li class="nav-section">CI/CD & Automatización</li>
+            <li class="nav-item" data-slide="33">
+                <span class="nav-item-number">33</span>
+                <span class="nav-item-title">CI/CD: Introducción</span>
+            </li>
+            <li class="nav-item" data-slide="34">
+                <span class="nav-item-number">34</span>
+                <span class="nav-item-title">GitHub Actions</span>
+            </li>
+            <li class="nav-item" data-slide="35">
+                <span class="nav-item-number">35</span>
+                <span class="nav-item-title">GitHub Actions: Ejemplo Básico</span>
+            </li>
+            <li class="nav-item" data-slide="36">
+                <span class="nav-item-number">36</span>
+                <span class="nav-item-title">GitHub Actions: Features Avanzadas</span>
+            </li>
+            <li class="nav-item" data-slide="37">
+                <span class="nav-item-number">37</span>
+                <span class="nav-item-title">GitHub Actions: Marketplace</span>
+            </li>
+            <li class="nav-item" data-slide="38">
+                <span class="nav-item-number">38</span>
+                <span class="nav-item-title">GitLab CI/CD</span>
+            </li>
+            <li class="nav-item" data-slide="39">
+                <span class="nav-item-number">39</span>
+                <span class="nav-item-title">Pipeline CI/CD Completo</span>
+            </li>
+            <li class="nav-item" data-slide="40">
+                <span class="nav-item-number">40</span>
+                <span class="nav-item-title">Testing en Pipelines</span>
+            </li>
+            <li class="nav-item" data-slide="41">
+                <span class="nav-item-number">41</span>
+                <span class="nav-item-title">Security Scanning en CI/CD</span>
+            </li>
+            <li class="nav-item" data-slide="42">
+                <span class="nav-item-number">42</span>
+                <span class="nav-item-title">Estrategias de Deployment</span>
+            </li>
+            <li class="nav-item" data-slide="43">
+                <span class="nav-item-number">43</span>
+                <span class="nav-item-title">Gestión de Entornos</span>
+            </li>
+            <li class="nav-item" data-slide="44">
+                <span class="nav-item-number">44</span>
+                <span class="nav-item-title">Monitoring & Observability</span>
+            </li>
+            <li class="nav-item" data-slide="45">
+                <span class="nav-item-number">45</span>
+                <span class="nav-item-title">Buenas Prácticas CI/CD</span>
+            </li>
+
+            <li class="nav-section">Cierre</li>
+            <li class="nav-item" data-slide="48">
+                <span class="nav-item-number">48</span>
+                <span class="nav-item-title">Recursos y Documentación</span>
+            </li>
+            <li class="nav-item" data-slide="49">
+                <span class="nav-item-number">49</span>
+                <span class="nav-item-title">Bibliografía y Papers</span>
+            </li>
+            <li class="nav-item" data-slide="50">
+                <span class="nav-item-number">50</span>
+                <span class="nav-item-title">¿Preguntas?</span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Reveal.js Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/markdown/markdown.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.js"></script>
+
+    <script>
+        Reveal.initialize({
+            hash: true,
+            slideNumber: 'c/t',
+            transition: 'slide',
+            backgroundTransition: 'fade',
+            center: false,
+            width: 1280,
+            height: 720,
+            margin: 0.04,
+            plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ],
+            keyboard: {
+                77: function() { // M key
+                    toggleNav();
+                },
+                27: function() { // ESC key
+                    closeNav();
+                }
+            }
+        });
+
+        // Navigation functionality
+        const menuButton = document.getElementById('menuButton');
+        const indexButton = document.getElementById('indexButton');
+        const closeButton = document.getElementById('closeButton');
+        const overlay = document.getElementById('overlay');
+        const navPanel = document.getElementById('navPanel');
+        const navItems = document.querySelectorAll('.nav-item');
+
+        function toggleNav() {
+            navPanel.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        function closeNav() {
+            navPanel.classList.remove('active');
+            overlay.classList.remove('active');
+        }
+
+        menuButton.addEventListener('click', toggleNav);
+        closeButton.addEventListener('click', closeNav);
+        overlay.addEventListener('click', closeNav);
+
+        // Go to index slide (slide 1)
+        indexButton.addEventListener('click', function() {
+            Reveal.slide(1);
+        });
+
+        // Navigate to specific slide when clicking nav items
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const slideIndex = parseInt(this.getAttribute('data-slide'));
+                Reveal.slide(slideIndex);
+                closeNav();
+            });
+        });
+
+        // Highlight current slide in navigation
+        Reveal.on('slidechanged', event => {
+            // Remove active class from all items
+            navItems.forEach(item => {
+                item.style.background = '';
+                item.style.borderLeftColor = 'transparent';
+            });
+
+            // Add active class to current slide
+            const currentSlide = event.indexh;
+            const activeItem = document.querySelector(`.nav-item[data-slide="${currentSlide}"]`);
+            if (activeItem) {
+                activeItem.style.background = 'rgba(74, 144, 226, 0.3)';
+                activeItem.style.borderLeftColor = '#4A90E2';
+            }
+        });
+
+        // Close navigation with ESC key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeNav();
+            }
+        });
+
+        // Handle clicks on index links (slide 2)
+        const indexLinks = document.querySelectorAll('.index-link');
+        indexLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const slideIndex = parseInt(this.getAttribute('data-slide'));
+                Reveal.slide(slideIndex);
+            });
+        });
+    </script>
+</body>
+</html>
