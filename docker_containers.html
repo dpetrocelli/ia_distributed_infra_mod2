@@ -30,14 +30,15 @@
 
         .reveal {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            font-size: 22px;
+            font-size: calc(26px * var(--zoom-level, 1));
             color: var(--negro);
             background-color: var(--blanco-roto);
+            transition: font-size 0.1s ease;
         }
 
         .reveal h1 {
             color: var(--navy);
-            font-size: 2.2em;
+            font-size: 2.4em;
             font-weight: 600;
             text-transform: uppercase;
             margin-bottom: 0.2em;
@@ -46,7 +47,7 @@
 
         .reveal h2 {
             color: var(--navy);
-            font-size: 1.6em;
+            font-size: 1.8em;
             font-weight: 600;
             text-transform: uppercase;
             margin-bottom: 0.3em;
@@ -58,7 +59,7 @@
 
         .reveal h3 {
             color: var(--gris-oscuro);
-            font-size: 1.2em;
+            font-size: 1.4em;
             font-weight: 600;
             text-transform: none;
             margin-bottom: 0.3em;
@@ -66,22 +67,25 @@
 
         .reveal .slides section {
             text-align: left;
-            padding: 10px;
+            padding: 15px;
             height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
 
         .reveal section.title-slide {
             text-align: center;
+            overflow: visible;
         }
 
         .reveal ul {
-            margin: 0.3em 0;
-            line-height: 1.3;
+            margin: 0.4em 0;
+            line-height: 1.5;
         }
 
         .reveal li {
-            margin: 0.2em 0;
-            font-size: 0.95em;
+            margin: 0.3em 0;
+            font-size: 1em;
         }
 
         .reveal strong {
@@ -95,24 +99,45 @@
             border-radius: 4px;
             color: var(--terracota);
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9em;
+            font-size: 0.92em;
             font-weight: 500;
             border: 1px solid rgba(139, 74, 43, 0.2);
         }
 
         .reveal pre {
-            margin: 0.3em 0;
-            font-size: 0.75em;
+            margin: 0.4em 0;
+            font-size: 0.8em;
         }
 
         .reveal pre code {
-            padding: 0.7em;
+            padding: 0.8em;
             background: var(--negro);
             color: var(--blanco-roto);
             border: 2px solid var(--gris-oscuro);
             border-radius: 6px;
             font-family: 'JetBrains Mono', monospace;
             box-shadow: 0 4px 12px rgba(46, 46, 46, 0.2);
+        }
+
+        .zoom-indicator {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(26, 43, 76, 0.9);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 10000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .zoom-indicator.show {
+            opacity: 1;
         }
 
         .logo-container {
@@ -2174,21 +2199,21 @@
                             <text x="25" y="105" font-size="10" fill="#666" text-anchor="end">15M</text>
                             <text x="25" y="65" font-size="10" fill="#666" text-anchor="end">20M+</text>
 
-                            <!-- Company logos simulation -->
-                            <circle cx="80" cy="60" r="18" fill="#DB4437"/>
-                            <text x="80" y="66" font-size="11" font-weight="bold" fill="white" text-anchor="middle">G</text>
+                            <!-- Company logos -->
+                            <!-- Google Cloud -->
+                            <image x="62" y="42" width="36" height="36" href="https://www.vectorlogo.zone/logos/google_cloud/google_cloud-icon.svg"/>
 
-                            <circle cx="140" cy="60" r="18" fill="#FF9900"/>
-                            <text x="140" y="66" font-size="10" font-weight="bold" fill="white" text-anchor="middle">AWS</text>
+                            <!-- AWS -->
+                            <image x="122" y="42" width="36" height="36" href="https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg"/>
 
-                            <circle cx="200" cy="60" r="18" fill="#0078D4"/>
-                            <text x="200" y="66" font-size="10" font-weight="bold" fill="white" text-anchor="middle">MS</text>
+                            <!-- Microsoft Azure -->
+                            <image x="182" y="42" width="36" height="36" href="https://www.vectorlogo.zone/logos/microsoft_azure/microsoft_azure-icon.svg"/>
 
-                            <circle cx="260" cy="60" r="18" fill="#052FAD"/>
-                            <text x="260" y="66" font-size="10" font-weight="bold" fill="white" text-anchor="middle">IBM</text>
+                            <!-- IBM Cloud -->
+                            <image x="242" y="42" width="36" height="36" href="https://www.vectorlogo.zone/logos/ibm_cloud/ibm_cloud-icon.svg"/>
 
-                            <circle cx="320" cy="60" r="18" fill="#F80000"/>
-                            <text x="320" y="66" font-size="11" font-weight="bold" fill="white" text-anchor="middle">O</text>
+                            <!-- Oracle Cloud -->
+                            <image x="302" y="42" width="36" height="36" href="https://www.vectorlogo.zone/logos/oracle/oracle-icon.svg"/>
 
                             <!-- 2025 Trend indicator -->
                             <path d="M 350 80 L 380 60" stroke="#27AE60" stroke-width="3" marker-end="url(#arrowTrend)"/>
@@ -2942,6 +2967,62 @@ docker login registry.example.com</pre>
             width: 1200,
             height: 700,
             margin: 0.04,
+        });
+
+        // Zoom functionality
+        let zoomLevel = 1;
+        let zoomTimeout;
+
+        // Create zoom indicator
+        const zoomIndicator = document.createElement('div');
+        zoomIndicator.className = 'zoom-indicator';
+        zoomIndicator.textContent = '100%';
+        document.body.appendChild(zoomIndicator);
+
+        // Handle wheel zoom
+        document.addEventListener('wheel', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? -0.1 : 0.1;
+                zoomLevel = Math.max(0.5, Math.min(2.5, zoomLevel + delta));
+                document.documentElement.style.setProperty('--zoom-level', zoomLevel);
+
+                zoomIndicator.textContent = Math.round(zoomLevel * 100) + '%';
+                zoomIndicator.classList.add('show');
+
+                clearTimeout(zoomTimeout);
+                zoomTimeout = setTimeout(() => {
+                    zoomIndicator.classList.remove('show');
+                }, 1000);
+            }
+        }, { passive: false });
+
+        // Handle keyboard shortcuts for zoom
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === '0') {
+                    e.preventDefault();
+                    zoomLevel = 1;
+                    document.documentElement.style.setProperty('--zoom-level', zoomLevel);
+                    zoomIndicator.textContent = '100%';
+                    zoomIndicator.classList.add('show');
+                    setTimeout(() => zoomIndicator.classList.remove('show'), 1000);
+                } else if (e.key === '+' || e.key === '=') {
+                    e.preventDefault();
+                    zoomLevel = Math.min(2.5, zoomLevel + 0.1);
+                    document.documentElement.style.setProperty('--zoom-level', zoomLevel);
+                    zoomIndicator.textContent = Math.round(zoomLevel * 100) + '%';
+                    zoomIndicator.classList.add('show');
+                    setTimeout(() => zoomIndicator.classList.remove('show'), 1000);
+                } else if (e.key === '-' || e.key === '_') {
+                    e.preventDefault();
+                    zoomLevel = Math.max(0.5, zoomLevel - 0.1);
+                    document.documentElement.style.setProperty('--zoom-level', zoomLevel);
+                    zoomIndicator.textContent = Math.round(zoomLevel * 100) + '%';
+                    zoomIndicator.classList.add('show');
+                    setTimeout(() => zoomIndicator.classList.remove('show'), 1000);
+                }
+            }
         });
 
         // Navigation functionality

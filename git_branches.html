@@ -30,14 +30,15 @@
 
         .reveal {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            font-size: 22px;
+            font-size: calc(26px * var(--zoom-level, 1));
             color: var(--negro);
             background-color: var(--blanco-roto);
+            transition: font-size 0.1s ease;
         }
 
         .reveal h1 {
             color: var(--navy);
-            font-size: 2.2em;
+            font-size: 2.4em;
             font-weight: 600;
             text-transform: uppercase;
             margin-bottom: 0.3em;
@@ -46,7 +47,7 @@
 
         .reveal h2 {
             color: var(--navy);
-            font-size: 1.6em;
+            font-size: 1.8em;
             font-weight: 600;
             text-transform: uppercase;
             margin-bottom: 0.5em;
@@ -58,7 +59,7 @@
 
         .reveal h3 {
             color: var(--gris-oscuro);
-            font-size: 1.2em;
+            font-size: 1.4em;
             font-weight: 600;
             text-transform: none;
             margin-bottom: 0.4em;
@@ -68,20 +69,23 @@
             text-align: left;
             padding: 15px;
             height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
         }
 
         .reveal section.title-slide {
             text-align: center;
+            overflow: visible;
         }
 
         .reveal ul {
             margin: 0.5em 0;
-            line-height: 1.4;
+            line-height: 1.5;
         }
 
         .reveal li {
             margin: 0.3em 0;
-            font-size: 0.95em;
+            font-size: 1em;
         }
 
         .reveal strong {
@@ -95,14 +99,14 @@
             border-radius: 4px;
             color: var(--terracota);
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.9em;
+            font-size: 0.92em;
             font-weight: 500;
             border: 1px solid rgba(139, 74, 43, 0.2);
         }
 
         .reveal pre {
             margin: 0.5em 0;
-            font-size: 0.75em;
+            font-size: 0.8em;
         }
 
         .reveal pre code {
@@ -113,6 +117,27 @@
             border-radius: 6px;
             font-family: 'JetBrains Mono', monospace;
             box-shadow: 0 4px 12px rgba(46, 46, 46, 0.2);
+        }
+
+        .zoom-indicator {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(26, 43, 76, 0.9);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 10000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .zoom-indicator.show {
+            opacity: 1;
         }
 
         .logo-container {
@@ -615,65 +640,70 @@
             <!-- Slide 3: Motivación 1 - Archivos -->
             <section>
                 <h2>MOTIVACIÓN (1)</h2>
-                <div style="display: flex; justify-content: center; gap: 1em; margin-top: 1em; flex-wrap: wrap;">
-                    <svg width="100" height="120" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="10" y="15" width="80" height="100" fill="#D3D3D3" rx="5"/>
-                        <path d="M 10 15 L 10 25 L 60 25 L 70 15 Z" fill="#A9A9A9"/>
-                        <line x1="20" y1="40" x2="80" y2="40" stroke="#666" stroke-width="2"/>
-                        <line x1="20" y1="50" x2="80" y2="50" stroke="#666" stroke-width="2"/>
-                        <line x1="20" y1="60" x2="70" y2="60" stroke="#666" stroke-width="2"/>
-                        <text x="50" y="95" font-family="monospace" font-size="10" fill="#333" text-anchor="middle">tp_final.tex</text>
+                <div style="display: flex; justify-content: center; gap: 1.5em; margin-top: 1.5em; flex-wrap: wrap; align-items: flex-end;">
+                    <svg width="140" height="170" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="10" y="20" width="120" height="130" fill="#D3D3D3" rx="8" stroke="#999" stroke-width="2"/>
+                        <path d="M 10 20 L 10 35 L 85 35 L 100 20 Z" fill="#A9A9A9"/>
+                        <line x1="25" y1="55" x2="115" y2="55" stroke="#666" stroke-width="3"/>
+                        <line x1="25" y1="70" x2="115" y2="70" stroke="#666" stroke-width="3"/>
+                        <line x1="25" y1="85" x2="100" y2="85" stroke="#666" stroke-width="3"/>
+                        <line x1="25" y1="100" x2="110" y2="100" stroke="#666" stroke-width="3"/>
+                        <text x="70" y="165" font-family="Inter, monospace" font-size="13" font-weight="600" fill="#333" text-anchor="middle">tp_final.tex</text>
                     </svg>
-                    <svg width="100" height="120" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="10" y="15" width="80" height="100" fill="#D3D3D3" rx="5"/>
-                        <path d="M 10 15 L 10 25 L 60 25 L 70 15 Z" fill="#A9A9A9"/>
-                        <line x1="20" y1="40" x2="80" y2="40" stroke="#666" stroke-width="2"/>
-                        <line x1="20" y1="50" x2="80" y2="50" stroke="#666" stroke-width="2"/>
-                        <line x1="20" y1="60" x2="70" y2="60" stroke="#666" stroke-width="2"/>
-                        <text x="50" y="95" font-family="monospace" font-size="9" fill="#333" text-anchor="middle">tp_final_2.tex</text>
+                    <svg width="140" height="170" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="10" y="20" width="120" height="130" fill="#D3D3D3" rx="8" stroke="#999" stroke-width="2"/>
+                        <path d="M 10 20 L 10 35 L 85 35 L 100 20 Z" fill="#A9A9A9"/>
+                        <line x1="25" y1="55" x2="115" y2="55" stroke="#666" stroke-width="3"/>
+                        <line x1="25" y1="70" x2="115" y2="70" stroke="#666" stroke-width="3"/>
+                        <line x1="25" y1="85" x2="100" y2="85" stroke="#666" stroke-width="3"/>
+                        <line x1="25" y1="100" x2="110" y2="100" stroke="#666" stroke-width="3"/>
+                        <text x="70" y="165" font-family="Inter, monospace" font-size="13" font-weight="600" fill="#333" text-anchor="middle">tp_final_2.tex</text>
                     </svg>
-                    <svg width="120" height="120" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="10" y="15" width="100" height="100" fill="#D3D3D3" rx="5"/>
-                        <path d="M 10 15 L 10 25 L 70 25 L 80 15 Z" fill="#A9A9A9"/>
-                        <line x1="20" y1="40" x2="100" y2="40" stroke="#666" stroke-width="2"/>
-                        <line x1="20" y1="50" x2="100" y2="50" stroke="#666" stroke-width="2"/>
-                        <line x1="20" y1="60" x2="90" y2="60" stroke="#666" stroke-width="2"/>
-                        <text x="60" y="95" font-family="monospace" font-size="8" fill="#333" text-anchor="middle">tp_final_este_va.tex</text>
+                    <svg width="170" height="170" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="10" y="20" width="150" height="130" fill="#D3D3D3" rx="8" stroke="#999" stroke-width="2"/>
+                        <path d="M 10 20 L 10 35 L 105 35 L 120 20 Z" fill="#A9A9A9"/>
+                        <line x1="25" y1="55" x2="145" y2="55" stroke="#666" stroke-width="3"/>
+                        <line x1="25" y1="70" x2="145" y2="70" stroke="#666" stroke-width="3"/>
+                        <line x1="25" y1="85" x2="130" y2="85" stroke="#666" stroke-width="3"/>
+                        <line x1="25" y1="100" x2="140" y2="100" stroke="#666" stroke-width="3"/>
+                        <text x="85" y="165" font-family="Inter, monospace" font-size="12" font-weight="600" fill="#333" text-anchor="middle">tp_final_este_va.tex</text>
                     </svg>
-                    <svg width="110" height="120" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="10" y="15" width="90" height="100" fill="#D3D3D3" rx="5"/>
-                        <path d="M 10 15 L 10 25 L 65 25 L 75 15 Z" fill="#A9A9A9"/>
-                        <line x1="20" y1="40" x2="90" y2="40" stroke="#666" stroke-width="2"/>
-                        <line x1="20" y1="50" x2="90" y2="50" stroke="#666" stroke-width="2"/>
-                        <line x1="20" y1="60" x2="80" y2="60" stroke="#666" stroke-width="2"/>
-                        <text x="55" y="95" font-family="monospace" font-size="8" fill="#333" text-anchor="middle">tp_final_posta.tex</text>
+                    <svg width="160" height="170" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="10" y="20" width="140" height="130" fill="#D3D3D3" rx="8" stroke="#999" stroke-width="2"/>
+                        <path d="M 10 20 L 10 35 L 95 35 L 110 20 Z" fill="#A9A9A9"/>
+                        <line x1="25" y1="55" x2="135" y2="55" stroke="#666" stroke-width="3"/>
+                        <line x1="25" y1="70" x2="135" y2="70" stroke="#666" stroke-width="3"/>
+                        <line x1="25" y1="85" x2="120" y2="85" stroke="#666" stroke-width="3"/>
+                        <line x1="25" y1="100" x2="130" y2="100" stroke="#666" stroke-width="3"/>
+                        <text x="80" y="165" font-family="Inter, monospace" font-size="12" font-weight="600" fill="#333" text-anchor="middle">tp_final_posta.tex</text>
                     </svg>
-                    <svg width="130" height="120" xmlns="http://www.w3.org/2000/svg">
-                        <rect x="10" y="15" width="110" height="100" fill="#D3D3D3" rx="5"/>
-                        <path d="M 10 15 L 10 25 L 75 25 L 85 15 Z" fill="#A9A9A9"/>
-                        <line x1="20" y1="40" x2="110" y2="40" stroke="#666" stroke-width="2"/>
-                        <line x1="20" y1="50" x2="110" y2="50" stroke="#666" stroke-width="2"/>
-                        <line x1="20" y1="60" x2="100" y2="60" stroke="#666" stroke-width="2"/>
-                        <text x="65" y="95" font-family="monospace" font-size="8" fill="#333" text-anchor="middle">tp_final_reentrega.tex</text>
+                    <svg width="180" height="170" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="10" y="20" width="160" height="130" fill="#D3D3D3" rx="8" stroke="#999" stroke-width="2"/>
+                        <path d="M 10 20 L 10 35 L 110 35 L 125 20 Z" fill="#A9A9A9"/>
+                        <line x1="25" y1="55" x2="155" y2="55" stroke="#666" stroke-width="3"/>
+                        <line x1="25" y1="70" x2="155" y2="70" stroke="#666" stroke-width="3"/>
+                        <line x1="25" y1="85" x2="140" y2="85" stroke="#666" stroke-width="3"/>
+                        <line x1="25" y1="100" x2="150" y2="100" stroke="#666" stroke-width="3"/>
+                        <text x="90" y="165" font-family="Inter, monospace" font-size="12" font-weight="600" fill="#333" text-anchor="middle">tp_final_reentrega.tex</text>
                     </svg>
                 </div>
-                <div style="text-align: center; margin-top: 2em;">
-                    <svg width="200" height="180" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Cara asustada -->
-                        <circle cx="100" cy="90" r="70" fill="#E0E0E0" stroke="#333" stroke-width="3"/>
+                <div style="text-align: center; margin-top: 2.5em;">
+                    <svg width="300" height="260" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Cara asustada más grande -->
+                        <circle cx="150" cy="130" r="90" fill="#E0E0E0" stroke="#333" stroke-width="4"/>
                         <!-- Ojos muy abiertos -->
-                        <ellipse cx="75" cy="75" rx="15" ry="20" fill="white" stroke="#333" stroke-width="2"/>
-                        <ellipse cx="125" cy="75" rx="15" ry="20" fill="white" stroke="#333" stroke-width="2"/>
-                        <circle cx="75" cy="75" r="8" fill="#000"/>
-                        <circle cx="125" cy="75" r="8" fill="#000"/>
+                        <ellipse cx="120" cy="110" rx="18" ry="25" fill="white" stroke="#333" stroke-width="3"/>
+                        <ellipse cx="180" cy="110" rx="18" ry="25" fill="white" stroke="#333" stroke-width="3"/>
+                        <circle cx="120" cy="110" r="10" fill="#000"/>
+                        <circle cx="180" cy="110" r="10" fill="#000"/>
                         <!-- Boca abierta de pánico -->
-                        <ellipse cx="100" cy="120" rx="25" ry="30" fill="#333"/>
+                        <ellipse cx="150" cy="160" rx="30" ry="38" fill="#333"/>
                         <!-- Cejas levantadas -->
-                        <path d="M 60 55 Q 75 50 90 55" stroke="#333" stroke-width="3" fill="none"/>
-                        <path d="M 110 55 Q 125 50 140 55" stroke="#333" stroke-width="3" fill="none"/>
+                        <path d="M 95 85 Q 117 78 138 85" stroke="#333" stroke-width="4" fill="none"/>
+                        <path d="M 162 85 Q 183 78 205 85" stroke="#333" stroke-width="4" fill="none"/>
                         <!-- Gotas de sudor -->
-                        <ellipse cx="40" cy="50" rx="8" ry="12" fill="#4A90E2" opacity="0.6"/>
-                        <ellipse cx="160" cy="50" rx="8" ry="12" fill="#4A90E2" opacity="0.6"/>
+                        <ellipse cx="60" cy="75" rx="10" ry="15" fill="#4A90E2" opacity="0.6"/>
+                        <ellipse cx="240" cy="75" rx="10" ry="15" fill="#4A90E2" opacity="0.6"/>
                     </svg>
                 </div>
             </section>
@@ -2320,6 +2350,62 @@ deploy_production:
                 },
                 27: function() { // ESC key
                     closeNav();
+                }
+            }
+        });
+
+        // Zoom functionality
+        let zoomLevel = 1;
+        let zoomTimeout;
+
+        // Create zoom indicator
+        const zoomIndicator = document.createElement('div');
+        zoomIndicator.className = 'zoom-indicator';
+        zoomIndicator.textContent = '100%';
+        document.body.appendChild(zoomIndicator);
+
+        // Handle wheel zoom
+        document.addEventListener('wheel', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? -0.1 : 0.1;
+                zoomLevel = Math.max(0.5, Math.min(2.5, zoomLevel + delta));
+                document.documentElement.style.setProperty('--zoom-level', zoomLevel);
+
+                zoomIndicator.textContent = Math.round(zoomLevel * 100) + '%';
+                zoomIndicator.classList.add('show');
+
+                clearTimeout(zoomTimeout);
+                zoomTimeout = setTimeout(() => {
+                    zoomIndicator.classList.remove('show');
+                }, 1000);
+            }
+        }, { passive: false });
+
+        // Handle keyboard shortcuts for zoom
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                if (e.key === '0') {
+                    e.preventDefault();
+                    zoomLevel = 1;
+                    document.documentElement.style.setProperty('--zoom-level', zoomLevel);
+                    zoomIndicator.textContent = '100%';
+                    zoomIndicator.classList.add('show');
+                    setTimeout(() => zoomIndicator.classList.remove('show'), 1000);
+                } else if (e.key === '+' || e.key === '=') {
+                    e.preventDefault();
+                    zoomLevel = Math.min(2.5, zoomLevel + 0.1);
+                    document.documentElement.style.setProperty('--zoom-level', zoomLevel);
+                    zoomIndicator.textContent = Math.round(zoomLevel * 100) + '%';
+                    zoomIndicator.classList.add('show');
+                    setTimeout(() => zoomIndicator.classList.remove('show'), 1000);
+                } else if (e.key === '-' || e.key === '_') {
+                    e.preventDefault();
+                    zoomLevel = Math.max(0.5, zoomLevel - 0.1);
+                    document.documentElement.style.setProperty('--zoom-level', zoomLevel);
+                    zoomIndicator.textContent = Math.round(zoomLevel * 100) + '%';
+                    zoomIndicator.classList.add('show');
+                    setTimeout(() => zoomIndicator.classList.remove('show'), 1000);
                 }
             }
         });
