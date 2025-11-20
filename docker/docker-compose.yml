@@ -10,13 +10,11 @@ services:
     restart: always
   
   db:
-    image: postgres:15-alpine
+    image: mipostgres:latest
     environment:
       POSTGRES_USER: usuario
       POSTGRES_PASSWORD: password123
       POSTGRES_DB: miapp
     ports:
       - "5432:5432"
-    volumes:
-      - db_data:/var/lib/postgresql/data
     restart: always

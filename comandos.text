@@ -16,3 +16,5 @@ cd ..
 
 #uso de docker compose
 docker-compose up
+
+docker stop $(docker ps -aq) ; docker rm $(docker ps -aq)
