@@ -10,7 +10,10 @@ services:
     restart: always
   
   db:
-    image: mipostgres:latest
+    build:
+      context: .
+      dockerfile: DockerfilePostgres
+    
     environment:
       POSTGRES_USER: usuario
       POSTGRES_PASSWORD: password123
