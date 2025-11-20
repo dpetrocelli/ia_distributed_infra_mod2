@@ -13,3 +13,6 @@ curl http://127.0.0.1:8000/status
 curl http://127.0.0.1:8000/
 
 cd ..
+
+#uso de docker compose
+docker-compose up
