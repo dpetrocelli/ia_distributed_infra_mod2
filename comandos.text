@@ -1,0 +1,5 @@
+git clone repo
+cd docker
+docker build . -t prueba1
+docker run --rm --name contenedor1 prueba1
+docker image ls | head -2
