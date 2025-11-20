@@ -1,5 +1,15 @@
+# Cada vez que david haga push / equipo hacer pull 
+# solo 1 vez
 git clone repo
+
+# Luego siempre pull (git pull) hacer en la raiz del repositorio
+
 cd docker
-docker build . -t prueba1
+docker build -t prueba1 -f Dockerfile .
 docker run --rm --name contenedor1 prueba1
 docker image ls | head -2
+
+curl http://127.0.0.1:8000/status
+curl http://127.0.0.1:8000/
+
+cd ..
