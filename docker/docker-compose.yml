@@ -1,10 +1,18 @@
 version: '3.8'
 
 services:
-  app:
+  app1:
     build:
       context: .
       dockerfile: DockerfilePepe
     ports:
       - "9300:8000"
+    restart: always
+  
+  app2:
+    build:
+      context: .
+      dockerfile: DockerfilePepe
+    ports:
+      - "9301:8000"
     restart: always
