@@ -27,3 +27,24 @@ services:
     ports:
       - "5432:5432"
     restart: always
+
+  db2:
+    image: mariadb:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: miapp2
+      MYSQL_USER: usuario2
+      MYSQL_PASSWORD: password456
+    ports:
+      - "3306:3306"
+    restart: always 
+  
+  db3:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_USER: usuario
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: miapp
+    ports:
+      - "5433:5432"
+    restart: always
