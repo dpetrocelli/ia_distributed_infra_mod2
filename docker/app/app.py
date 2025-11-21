@@ -13,6 +13,16 @@ def home():
 def status():
     return {"status": "ok"}
 
+@app.get("/list_users")
+def list_users():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT id, name, email FROM users;")
+    users = cur.fetchall()
+    cur.close()
+    conn.close()
+    return {"users": users}
+
 def get_db_connection():
     conn = psycopg2.connect(
         host="db",
@@ -27,12 +37,3 @@ def get_db_connection():
 # os.environ.get('DB_HOST')
 
 
-@app.get("/list_users")
-def list_users():
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT id, name, email FROM users;")
-    users = cur.fetchall()
-    cur.close()
-    conn.close()
-    return {"users": users}
