@@ -11,7 +11,8 @@ services:
       - "9300:8000"
     restart: always
     depends_on:
-      - db
+      db:
+        condition: service_healthy
   
   
   db:
@@ -24,9 +25,14 @@ services:
       POSTGRES_DB: miapp
     ports:
       - "5432:5432"
-    #volumes:
-    #  - db_data:/var/lib/postgresql/data
+    volumes:
+      - db_data:/var/lib/postgresql/data
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U usuario -d miapp"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-  #volumes:
-    #db_data: {}
+volumes:
+  db_data: {}

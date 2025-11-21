@@ -2,3 +2,6 @@ FROM postgres:15-alpine
 
 RUN apk update
 RUN apk add curl
+
+# Copiar el script de inicialización
+COPY db/init.sql /docker-entrypoint-initdb.d/
